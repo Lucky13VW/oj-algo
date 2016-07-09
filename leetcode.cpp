@@ -107,6 +107,35 @@ public:
 };
 
 /*
+8. String to Integer (atoi)
+*/
+class MyAtoiSolution {
+public:
+    int myAtoi(string str) 
+    {
+        int total=0;
+        int sign=1;
+        size_t start = str.find_first_not_of(" ");
+        for(int i=start;i<str.size();i++)
+        {
+            char val =str[i];
+            if(val >='0' && val<='9')
+            {
+                if(total> INT_MAX/10 || (total==INT_MAX/10 && val-'0'>INT_MAX%10))
+                     return sign==1?INT_MAX:INT_MIN;
+                total=total*10+(val-'0');
+            }
+            else if('-' == val && i==start) sign=-1;
+            else if('+'==val && i==start) continue;
+            else break;
+        }
+        
+        return total*sign;
+    }
+};
+
+
+/*
 77. Combinations
 Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
 */
@@ -267,36 +296,46 @@ public:
     }
 };
 
-/*
-8. String to Integer (atoi)
-*/
-class MyAtoiSolution {
+class BitmapSort
+{
+    #define ONE_BYTE 8
 public:
-    int myAtoi(string str) 
+    void Sort(int *data,int len)
     {
-        int total=0;
-        int sign=1;
-        size_t start = str.find_first_not_of(" ");
-        for(int i=start;i<str.size();i++)
+        char bit_array[4]={0};
+        for(int i=0;i<len;i++)
         {
-            char val =str[i];
-            if(val >='0' && val<='9')
-            {
-                if(total> INT_MAX/10 || (total==INT_MAX/10 && val-'0'>INT_MAX%10))
-                     return sign==1?INT_MAX:INT_MIN;
-                total=total*10+(val-'0');
-            }
-            else if('-' == val && i==start) sign=-1;
-            else if('+'==val && i==start) continue;
-            else break;
+            int num=data[i];
+            int index= num/ONE_BYTE;
+            int offset= num%ONE_BYTE;
+            bit_array[index] |= 1<<offset;
         }
-        
-        return total*sign;
+        int array_idx=0;
+        for(int i=0;i<sizeof(bit_array);i++)
+        {
+            for(int j=0;j<ONE_BYTE;j++)
+            {
+                if((bit_array[i] & 1<<j) > 0 )
+                    data[array_idx++]=i*ONE_BYTE+j;
+            }
+        }
+    }
+    
+    static void Test()
+    {
+        int data[]={1,17,25,30,28,14,3,12,9,7,6,10,5,4,2,8};
+        int len = sizeof(data)/sizeof(int);
+        for(int i=0;i<len;i++) cout<<data[i]<<" ";
+        cout<<endl<<"Sorted:"<<endl;
+        BitmapSort bm;
+        bm.Sort(data,len);
+        for(int i=0;i<len;i++) cout<<data[i]<<" ";
+        cout<<endl;
     }
 };
 
 int main(int argc,char *argv[])
 {
-
+    BitmapSort::Test();
     return 0;
 }
