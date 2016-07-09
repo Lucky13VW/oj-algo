@@ -135,6 +135,73 @@ public:
 };
 
 /*
+121. Best Time to Buy and Sell Stock  QuestionEditorial Solution  My Submissions
+Total Accepted: 112522
+Total Submissions: 307050
+Difficulty: Easy
+Say you have an array for which the ith element is the price of a given stock on day i.
+
+If you were only permitted to complete at most one transaction (ie, buy one and sell one share of the stock), design an algorithm to find the maximum profit.
+
+Example 1:
+Input: [7, 1, 5, 3, 6, 4]
+Output: 5
+max. difference = 6-1 = 5 (not 7-1 = 6£©
+
+Example 2:
+Input: [7, 6, 4, 3, 1]
+Output: 0
+
+In this case, no transaction is done, i.e. max profit = 0.
+*/
+
+class BestTimeStock1Solution
+{
+public:
+    vector<int> MaxProfit(vector<int> &prices)
+    {
+        vector<int> best;
+        if (prices.size() == 0)
+            return best;  
+          
+        int try_buy_price = prices[0]; 
+        int best_buy_time=0,try_buy_time=0,best_sell_time=0,max_profit = 0;
+        for (int i = 1; i < prices.size(); i++)
+        {  
+            //prices[i] - min > profit ? prices[i] - min : profit;
+            int profit = prices[i] - try_buy_price;
+            if(profit > max_profit)
+            {
+                max_profit = profit;
+                best_sell_time = i;
+                best_buy_time = try_buy_time;
+            }
+            if( prices[i] < try_buy_price)
+            {
+                try_buy_price = prices[i];
+                try_buy_time = i;
+            }
+            //prices[i] < min ? prices[i] : min;  
+        }
+        best.push_back(best_buy_time);best.push_back(best_sell_time);best.push_back(max_profit);
+        return best;  
+    }
+    
+    static void Test()
+    {
+        int data[15] = {9989,9992,9998,9997,9991,9925,9994,9993,9992,9999,9990,9989,9988,9987,9986};
+        vector<int> prices;
+        for (int i=0;i<15;i++)
+            prices.push_back(data[i]);
+
+        BestTimeStock1Solution best1;
+        vector<int> besttime=best1.MaxProfit(prices);
+        cout<<besttime[0]<<","<<besttime[1]<<","<<besttime[2]<<endl;
+    }
+};
+
+
+/*
 127. Word Ladder
 Given two words (beginWord and endWord), and a dictionary's word list, 
 find the length of shortest transformation sequence from beginWord to endWord, such that:
