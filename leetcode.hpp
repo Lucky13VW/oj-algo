@@ -1,9 +1,14 @@
+#ifndef LEETCODE_HPP
+#define LEETCODE_HPP
+
 #include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <climits>
 #include <stack>
+#include <algorithm>
+#include <string>
 
 using namespace std;
 
@@ -251,8 +256,10 @@ Return 0 if there is no such transformation sequence.
 All words have the same length.
 All words contain only lowercase alphabetic characters.
 */
+
 class WordLadderSolution {
 public:
+    // wrong result 
     int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) 
     {
         int total=0;
@@ -294,48 +301,25 @@ public:
         }
         return total;
     }
-};
 
-class BitmapSort
-{
-    #define ONE_BYTE 8
-public:
-    void Sort(int *data,int len)
-    {
-        char bit_array[4]={0};
-        for(int i=0;i<len;i++)
-        {
-            int num=data[i];
-            int index= num/ONE_BYTE;
-            int offset= num%ONE_BYTE;
-            bit_array[index] |= 1<<offset;
-        }
-        int array_idx=0;
-        for(int i=0;i<sizeof(bit_array);i++)
-        {
-            for(int j=0;j<ONE_BYTE;j++)
-            {
-                if((bit_array[i] & 1<<j) > 0 )
-                    data[array_idx++]=i*ONE_BYTE+j;
-            }
-        }
-    }
-    
     static void Test()
     {
-        int data[]={1,17,25,30,28,14,3,12,9,7,6,10,5,4,2,8};
-        int len = sizeof(data)/sizeof(int);
-        for(int i=0;i<len;i++) cout<<data[i]<<" ";
-        cout<<endl<<"Sorted:"<<endl;
-        BitmapSort bm;
-        bm.Sort(data,len);
-        for(int i=0;i<len;i++) cout<<data[i]<<" ";
-        cout<<endl;
+        unordered_set<string> dict_set;
+        dict_set.insert("hot");
+        dict_set.insert("dot");
+        dict_set.insert("dog");
+        dict_set.insert("lot");
+        dict_set.insert("log");
+        string begin_word = "hit";
+        string end_word = "cog";
+
+        WordLadderSolution word_ladder_sln;
+        cout << "Dictionary:" << endl;
+        for_each(dict_set.cbegin(), dict_set.cend(), [](auto &val) { cout << val << " "; });
+        cout << endl << "From:" << begin_word << endl;
+        cout << "To:" << end_word << endl;
+        cout << "Step:" << word_ladder_sln.ladderLength(begin_word, end_word, dict_set) << endl;
     }
 };
 
-int main(int argc,char *argv[])
-{
-    BitmapSort::Test();
-    return 0;
-}
+#endif
