@@ -234,6 +234,51 @@ public:
     }
 };
 
+class BestTimeSellStockIII
+{
+public:    
+    int maxProfit(vector<int> &prices)
+    {
+        if(prices.size() ==  0) return 0;
+
+        int max_profit=0;
+
+        for(int i=0;i<prices.size();i++)
+        {
+            max_profit = max(FindMax(prices,0,i)+FindMax(prices,i,prices.size()-1),max_profit);
+        }
+        return max_profit;
+    }
+    
+private:
+    int FindMax(vector<int> &prices,int start, int end)
+    {
+        if(start == end) return 0;
+
+        int max_profit = 0, try_buy_price = prices[start];
+        for(int i=start+1;i<end+1;i++)
+        {
+            max_profit = max(prices[i]-try_buy_price,max_profit);
+            try_buy_price = min(prices[i],try_buy_price);
+        }
+        return max_profit;
+    }
+
+public:
+    static void Test()
+    {
+        int data[8]={3,5,9,4,7,6,7,8};
+        vector<int> prices;
+        for(int i=0;i<8;i++)
+            prices.push_back(data[i]);
+
+        BestTimeSellStockIII best;
+        cout<<best.maxProfit(prices)<<endl;
+    }
+
+    
+};
+
 
 /*
 127. Word Ladder

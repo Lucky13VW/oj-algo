@@ -11,10 +11,10 @@
 #include <algorithm>
 
 using namespace std;
+
 /*
   Count sort,big O is n,  bitmap sort is to save memory 
 */
-
 class BitmapSort
 {
     #define ONE_BYTE 8
@@ -196,6 +196,119 @@ public:
 private:
     map<string, VertexPtr> Vertexes_;
     map<string, list<VertexPtr>> VertexAdjacents_;
+};
+
+class Combinate
+{
+public:
+  
+    void TotalC(int arr[], int count)
+    {
+        int total_num = (1<<count)-1;
+        for(int i=1; i< total_num+1;i++)
+        {
+            int j = 1,idx=0;
+            vector<int> disp;
+            while(j<=i)
+            {
+                if(j&i)
+                {
+                    disp.push_back(arr[idx]);
+                }
+                j<<=1;
+                idx++;
+            }
+            PrintList(disp);
+        }
+    }
+    
+private:
+    void PrintList(const vector<int>&vec)
+    {
+        vector<int>::const_iterator iter=vec.begin();
+        for(;iter!=vec.end();iter++)
+        {
+            cout<<*iter<<" ";
+        }
+        cout<<endl;
+    }
+
+public:
+    static void Test()
+    {
+        const int count=3;
+        int arr[count]={1,2,3};
+        Combinate comb;
+        comb.TotalC(arr,count);
+    }
+};
+
+class Permutate
+{
+public:
+    
+    void TotalP(int arr[],int count,int index,int need=0)
+    {
+        if (need == 0)
+            need = count;
+                               
+        if( index == need)
+        {
+            PrintArr(arr,need);
+            return;
+        }
+        
+        for(int i=index;i<count;i++)
+        {
+            Swap(arr[i],arr[index]);
+            TotalP(arr,count,index+1,need);
+            Swap(arr[i],arr[index]);
+        }
+    }
+
+    void TotalPStl(int arr[], int count)
+    {
+        int total = 0;
+        bool is_ok = false;
+        do
+        {
+            is_ok = next_permutation(arr,arr+count);
+            PrintArr(arr,count);
+            total++;
+        }while(is_ok);
+
+        while(prev_permutation(arr,arr+count))
+        {
+            PrintArr(arr,count);
+            total++;
+        }
+        cout<<"total:"<<total<<endl;
+    }
+    
+private:
+    void PrintArr(int arr[],int count)
+    {
+         for(int j=0;j<count;j++)
+             cout<<arr[j]<<" ";
+         cout<<endl;
+    }
+
+    void Swap(int &arr1, int &arr2)
+    {
+        if (arr1 != arr2)
+            swap(arr1,arr2);
+    }
+    
+public:
+    static void Test()
+    {
+        const int count = 3;
+        int data[count]={1,2,2};
+        Permutate per;
+        per.TotalP(data,count,0,3);
+        //per.TotalPStl(data,count);
+    } 
+    
 };
 
 #endif
