@@ -145,7 +145,8 @@ private:
             string vex_id = val->Id;
             if (visit_log.find(vex_id) == visit_log.end())
             {
-                if (DFS(vex_id, des_id, visit_log, path)) return true;
+                if (DFS(vex_id, des_id, visit_log, path)) 
+                    return true;
             }
         }
         if (path.size() > 0)
