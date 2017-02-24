@@ -1,0 +1,52 @@
+# setup user name email
+git config --global user.name "abc"
+git config --global user.email "abc@123.com"
+
+# setup SSH key for github
+ssh-keygen -t rsa -C "abc@123.com"
+# copy public key from ~/.ssh/id_rsa.pub to github
+# test ssh to github
+ssh -T git@github.com
+
+# clone project from  github
+git clone git@github.com:Lucky13VW/oj-algo.git oj_algo
+
+# git push remote_repository(default origin) local_branch(dev):remote_branch(master)
+git push origin dev:master
+
+# associate local to remote github 
+mkdir xxx & cd xxx
+git init
+git add .
+git commit -am "yyy"
+# xxx repository created on github remote default name is origin
+git remote add origin git@github.com:Lucky13VW/xxx.git
+# remote 
+git push -u origin master
+
+# review where origin links to
+git remote -v
+# rename the project name, redirect local to it
+git remote set-url origin git@github.com:Lucky13VW/ASX24-Tools.git
+
+
+# undo local change in working tree
+git checkout .
+git checkout xxx_file
+# undo added change in staged area
+# move the status to working tree
+git reset HEAD xxx.txt
+
+# create brank dev and switch to dev
+# git branch dev
+# git checkout dev
+git checkout -b dev
+# look up branches
+git branch
+* dev
+  master
+# switch back to master
+git branch master
+git merge dev
+git branch -d dev
+
