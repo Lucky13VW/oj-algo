@@ -8,6 +8,7 @@
 #include <list>
 #include <set>
 #include <memory>
+#include <stack>
 #include <algorithm>
 
 using namespace std;
@@ -129,6 +130,31 @@ public:
         }
     }
 
+    void SearchPathAll(const string &from_id, const string &to_id)
+    {
+        vector<string> path;
+        vector<vector<string>> paths;
+        set<string> visit_log;
+        DFSAll(from_id, to_id, visit_log, path, paths);
+        if (paths.size() > 0)
+        {
+            for (auto &val : paths)
+            {
+                for (auto &val2 : val)
+                {
+                    cout << val2;
+                    if (val2 != to_id) 
+                        cout << "->";
+                }
+                cout << endl;
+            }
+        }
+        else
+        {
+            cout << "No path exist!" << endl;
+        }
+    }
+
 private:
     bool DFS(const string &cur_id, const string &des_id, set<string> &visit_log, vector<string> &path)
     {
@@ -154,6 +180,67 @@ private:
             path.erase(--path.end());
         }
         return false;
+    }
+
+    bool DFS(const string &start_id , const string &des_id, vector<string> &path)
+    {
+        auto id_adj = VertexAdjacents_.find(start_id);
+        if (id_adj == VertexAdjacents_.end()) return false;
+
+        stack<string> search_path;
+        set<string> visit_log;
+        search_path.push(start_id);
+        visit_log.insert(start_id);
+        bool if_found = false;
+        while (search_path.size()>0)
+        {
+            const string &curr_id = search_path.top();
+            if (curr_id == des_id)
+            {
+                if_found = true;
+                break;
+            }
+            
+            auto curr_adj = VertexAdjacents_.find(curr_id);
+            if (curr_adj != VertexAdjacents_.end())
+            {
+                
+            }
+            else
+            {
+            }
+        }
+        return if_found;
+    }
+
+    void DFSAll(const string &cur_id, const string &des_id, set<string> &visit_log, 
+        vector<string> &path, vector<vector<string>> &paths)
+    {
+        auto cur_adj = VertexAdjacents_.find(cur_id);
+        if (cur_adj == VertexAdjacents_.end()) return;
+
+        visit_log.insert(cur_id);
+        path.push_back(cur_id);
+
+        if (cur_id == des_id)
+        {
+            paths.push_back(path);
+        }
+
+        for (auto val : cur_adj->second)
+        {
+            string vex_id = val->Id;
+            if (visit_log.find(vex_id) == visit_log.end())
+            {
+                DFSAll(vex_id, des_id, visit_log, path, paths);
+            }
+        }
+        // back-trace node
+        visit_log.erase(visit_log.find(cur_id));
+        if (path.size() > 0)
+        {
+            path.erase(--path.end());
+        }
     }
 
 public:
@@ -188,10 +275,8 @@ public:
         graph.ShowEdges();
         cout << "From A to E" << endl;
         graph.SearchPath("A","E");
-        cout << "From B to E " << endl;
-        graph.SearchPath("B","E");
-        cout << "From E to F" << endl;
-        graph.SearchPath("E","F");
+        cout << "From E to F all paths" << endl;
+        graph.SearchPathAll("E","F");
     }
 
 private:
