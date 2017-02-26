@@ -9,6 +9,7 @@
 #include <set>
 #include <memory>
 #include <stack>
+#include <queue>
 #include <algorithm>
 
 using namespace std;
@@ -111,7 +112,9 @@ public:
     {
         vector<string> path;
         set<string> visit_log;
-        DFS(from_id,to_id, visit_log, path);
+        //DFS(from_id,to_id, visit_log, path); recursion version
+        //DFS(from_id, to_id,path); // stack version
+        BFS(from_id, to_id, path);
         if (path.size() > 0)
         {
             for (auto &val : path) 
@@ -135,7 +138,8 @@ public:
         vector<string> path;
         vector<vector<string>> paths;
         set<string> visit_log;
-        DFSAll(from_id, to_id, visit_log, path, paths);
+        DFSAll(from_id, to_id, visit_log, path, paths); //recursion version
+        //DFSAll(from_id, to_id, paths); // stack version
         if (paths.size() > 0)
         {
             for (auto &val : paths)
@@ -156,6 +160,7 @@ public:
     }
 
 private:
+    // recursion version 
     bool DFS(const string &cur_id, const string &des_id, set<string> &visit_log, vector<string> &path)
     {
         auto cur_adj = VertexAdjacents_.find(cur_id);
@@ -180,37 +185,6 @@ private:
             path.erase(--path.end());
         }
         return false;
-    }
-
-    bool DFS(const string &start_id , const string &des_id, vector<string> &path)
-    {
-        auto id_adj = VertexAdjacents_.find(start_id);
-        if (id_adj == VertexAdjacents_.end()) return false;
-
-        stack<string> search_path;
-        set<string> visit_log;
-        search_path.push(start_id);
-        visit_log.insert(start_id);
-        bool if_found = false;
-        while (search_path.size()>0)
-        {
-            const string &curr_id = search_path.top();
-            if (curr_id == des_id)
-            {
-                if_found = true;
-                break;
-            }
-            
-            auto curr_adj = VertexAdjacents_.find(curr_id);
-            if (curr_adj != VertexAdjacents_.end())
-            {
-                
-            }
-            else
-            {
-            }
-        }
-        return if_found;
     }
 
     void DFSAll(const string &cur_id, const string &des_id, set<string> &visit_log, 
@@ -243,6 +217,159 @@ private:
         }
     }
 
+    // non-recursion stack version
+    bool DFS(const string &start_id, const string &des_id, vector<string> &path)
+    {
+        stack<string> search_path;
+        set<string> visit_log;
+        search_path.push(start_id);
+        visit_log.insert(start_id);
+        path.push_back(start_id);
+        if (start_id == des_id) return true;
+        bool if_found = false;
+
+        while (search_path.size()>0)
+        {
+            const string &curr_id = search_path.top();
+            
+            auto curr_adj = VertexAdjacents_.find(curr_id);
+            bool any_further = false;
+            if (curr_adj != VertexAdjacents_.end())
+            {
+                for (auto val : curr_adj->second)
+                {
+                    string vex_id = val->Id;
+                    if (visit_log.find(vex_id) == visit_log.end())
+                    {
+                        search_path.push(vex_id);
+                        path.push_back(vex_id);
+                        visit_log.insert(vex_id);
+                        if (vex_id == des_id)
+                        {
+                            if_found = true;
+                        }
+                        // no more loog go to deeper search
+                        any_further = true;
+                        break;
+                    }
+                }
+                if (if_found)
+                    break;
+            }
+            if (!any_further)
+            {
+                search_path.pop();
+                path.erase(--path.end());
+            }
+        }
+        return if_found;
+    }
+
+    // !!! not right
+    void DFSAll(const string &start_id, const string &des_id, vector<vector<string>> &paths)
+    {
+        stack<string> search_path;
+        set<string> visit_log;
+        vector<string> path;
+        search_path.push(start_id);
+        visit_log.insert(start_id);
+        path.push_back(start_id);
+        if (start_id == des_id) return;
+        while (search_path.size()>0)
+        {
+            const string &curr_id = search_path.top();
+            
+            auto curr_adj = VertexAdjacents_.find(curr_id);
+            bool any_further = false;
+            
+            if (curr_adj != VertexAdjacents_.end())
+            {
+                for (auto val : curr_adj->second)
+                {
+                    
+                    string vex_id = val->Id;
+                    if (visit_log.find(vex_id) == visit_log.end())
+                    {
+                        search_path.push(vex_id);
+                        visit_log.insert(vex_id);
+                        path.push_back(vex_id);
+                        if (vex_id == des_id)
+                            paths.push_back(path);
+
+                        any_further = true;
+                        break;
+                    }
+                }  
+            }
+            if (!any_further)
+            {
+                search_path.pop();
+                path.erase(--path.end());
+            }
+        }
+    }
+
+    // BFS based on a queue, find the shortest path
+    bool BFS(const string &from_id, const string &des_id, vector<string> &path)
+    {
+        typedef struct search_info
+        {
+            string id;
+            int depth;
+
+            search_info(const string &str,int n)
+                :id(str),
+                depth(n){}
+        }search_info_type;
+
+        int curr_level = 0;
+        set<string> visit_log;
+        queue<search_info_type> search_path;
+        search_path.push(search_info_type(from_id, curr_level));
+        visit_log.insert(from_id);
+        
+        bool if_found = false;
+        if (from_id == des_id) return true;
+
+        while (!search_path.empty())
+        {
+            const search_info_type &search_info = search_path.front();
+            const string &curr_id = search_info.id;
+            int prev_level = curr_level;
+            curr_level = search_info.depth;
+            if (path.size() > 0 && curr_level == prev_level)
+            {
+                path.erase(--path.end());
+            }
+            path.push_back(curr_id);
+            visit_log.insert(curr_id);
+            
+            auto adj = VertexAdjacents_.find(curr_id);
+            if (adj != VertexAdjacents_.end())
+            {
+                for (auto &val : adj->second)
+                {
+                    // check adjacent vertex
+                    const string &vex_id = val->Id;
+                    if (visit_log.find(vex_id) == visit_log.end())
+                    {
+                        search_path.push(search_info_type(vex_id, curr_level+1));
+                        if (vex_id == des_id)
+                        {
+                            if_found = true;
+                            path.push_back(vex_id);
+                            break;
+                        }
+                    }
+                }
+                if (if_found)
+                    break;
+            }
+            search_path.pop();
+        }
+        return if_found;
+    }
+
 public:
     void ShowEdges()
     {
@@ -266,12 +393,14 @@ public:
         graph.AddVertex("D",4);
         graph.AddVertex("E",5);
         graph.AddVertex("F",6);
+        graph.AddVertex("G",7);
         graph.AddEdge("A","B");
         graph.AddEdge("A","C");
         graph.AddEdge("B","D");
         graph.AddEdge("C","D");
         graph.AddEdge("C","E");
         graph.AddEdge("B","F");
+        graph.AddEdge("G","D");
         graph.ShowEdges();
         cout << "From A to E" << endl;
         graph.SearchPath("A","E");
