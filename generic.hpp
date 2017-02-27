@@ -522,8 +522,95 @@ public:
         Permutate per;
         per.TotalP(data,count,0,3);
         //per.TotalPStl(data,count);
-    } 
-    
+    }  
+};
+
+
+class BasicDP
+{
+public:
+    static void TestLIS()
+    {
+        int arr[] = {3,8,4,8,4,6};
+        vector<int>  input;
+        for (int val : arr)
+        {
+            cout << val << " ";
+            input.push_back(val);
+        }
+        cout << endl;
+        BasicDP dp;
+        cout << dp.LIS(input) << endl;
+        vector<int> output = dp.LISVector(input);
+        for_each(output.cbegin(), output.cend(), [](auto val) { cout << val << " ";  });
+        cout << endl;
+    }
+
+    // longest increasing subsequence O(N^2)
+    int LIS(const vector<int> &input)
+    {
+        if (input.size() == 0) return 0;
+
+        vector<int> lis_val;        
+        int longest_val = 1;
+        for_each(input.begin(), input.end(), [&](auto val) 
+        { 
+            lis_val.push_back(1);  
+        });
+
+        for (int i = 0; i < input.size(); i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                if (input[i] >= input[j] && lis_val[j] + 1 > lis_val[i])
+                    lis_val[i] = lis_val[j] + 1;
+            }
+            if (lis_val[i] > longest_val) longest_val = lis_val[i];
+        }
+        return longest_val;
+    }
+
+    vector<int> LISVector(const vector<int> &input)
+    {
+        if (input.size() == 0) return vector<int>();
+
+        vector<vector<int>> lis_val;
+        int longest_val = 1;
+        int longest_index = 0;
+        int selected_index = 0;
+        for (int i = 0; i < input.size(); i++)
+        {
+            vector<int> temp;
+            temp.push_back(input[0]);
+            lis_val.push_back(temp);
+        }
+
+        for (int i = 0; i < input.size(); i++)
+        {
+            bool selected_updated = false;
+            for (int j = 0; j < i; j++)
+            {
+                if (input[i] >= input[j] && lis_val[j].size() + 1 > lis_val[i].size())
+                {
+                    selected_index = j;
+                    selected_updated = true;
+                }
+            }
+            if (selected_updated)
+            {
+                vector<int> temp_vec(lis_val[selected_index]);
+                temp_vec.push_back(input[i]);
+                lis_val[i].swap(temp_vec);
+            }
+            if (lis_val[i].size() > longest_val)
+            {
+                longest_val = lis_val[i].size();
+                longest_index = i;
+            }
+        }
+        return lis_val[longest_index];
+    }
+
 };
 
 #endif

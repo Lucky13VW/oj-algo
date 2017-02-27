@@ -3,8 +3,9 @@
 
 int main(int argc,char *argv[])
 {
-    WordLadderSolution::Test();
+    //WordLadderSolution::Test();
     //MyGraph::Test();
+    BasicDP::TestLIS();
     ::getchar();
     return 0;
 }
