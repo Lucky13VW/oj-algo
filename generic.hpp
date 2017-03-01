@@ -611,6 +611,83 @@ public:
         return lis_val[longest_index];
     }
 
+
+    static void TestKnapsack01()
+    {
+        const int array_size = 5;
+        int weight_arr[array_size] = {2,2,6,5,4};
+        int value_arr[array_size] = {6,3,5,4,6};
+        
+        vector<int> weight;
+        vector<int> value;
+
+        cout << "weight:" << endl;
+        for (int data : weight_arr)
+        {
+            weight.push_back(data);
+            cout << data << " ";
+        }
+        cout << endl << "value:" << endl;
+        for (int data : value_arr)
+        {
+            value.push_back(data);
+            
+            cout << data << " ";
+        }
+        cout << endl;
+        BasicDP dp;
+        int max = dp.Knapsack0_1(value, weight, 10);
+        cout << "total:10, max:" << max << endl;;
+        
+    }
+
+    // 0-1 KnapSack 
+    int Knapsack0_1(const vector<int> &value_tab, const vector<int> &weight_tab, int weight_limit)
+    {
+        vector<vector<int>> max_value_tab;
+        for (int i = 0; i < value_tab.size(); i++)
+        {
+            vector<int> temp;
+            for (int j = 0; j <= weight_limit; j++)
+            {
+                temp.push_back(0);
+            }
+            max_value_tab.push_back(temp);
+        }
+
+        for (int index = 0; index < value_tab.size(); index++)
+        {
+            int weight_item = weight_tab[index];
+            int value_item = value_tab[index];
+            int pre_index = 0;
+            if (index > 0)
+                pre_index = index - 1;
+
+            for (int j = 0; j <= weight_limit; j++)
+            {    
+                int  without_item_value = max_value_tab[pre_index][j];
+                int max_value = without_item_value;
+                if (weight_item <= j)
+                {
+                    int with_item_value =  0;
+                    if (index>0)
+                    {
+                        int wighout_item_weight = j - weight_item;
+                        with_item_value = max_value_tab[pre_index][wighout_item_weight] + value_item;
+                    }
+                    else
+                    { 
+                        with_item_value = value_item;
+                    }
+                    max_value = without_item_value>with_item_value ? without_item_value : with_item_value;
+                }
+                max_value_tab[index][j] = max_value;
+            }
+        }
+
+        return max_value_tab[value_tab.size() - 1][weight_limit - 1];
+    }
+
 };
 
 #endif
