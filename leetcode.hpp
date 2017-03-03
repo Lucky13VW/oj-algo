@@ -144,22 +144,70 @@ public:
 77. Combinations
 Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
 */
-class CombinationSolution {
+class CombinationSolution 
+{
 public:
-    vector<vector<int>> combine(int n, int k) {
+    vector<vector<int>> combine(int n, int k) 
+    {
         vector<vector<int>> result;
         vector<int> group;
-        int start = 0, couont = 0;
+        int start = 0;
         dfs(n,k,1,0,group,result);
         return result;
     }
+
+    vector<vector<int>> combine2(int n, int k) 
+    {
+        vector<vector<int>> result;
+        int i = 0;
+        vector<int> group(k, 0);
+        while (i >= 0) 
+        {
+            group[i]++; // Increment element at index i
+
+            if (group[i] > n) // Move index to the left if the element exceeded n.
+            {
+                --i;
+            }
+            /* If the index is at the end of the vector
+            * c, then (because the other conditions are
+            * obeyed), we know we have a valid combination,
+            * so push it to our ans vector<vector<>>
+            */
+            else if (i == k - 1)
+            {
+                result.push_back(group);
+            }
+            /* Move index to the right and set the
+            * element at that index equal to the
+            * element at the previous index.
+            *
+            * Because of the increment at the beginning
+            * of this while loop, we ensure that the
+            * element at this index will be at least
+            * one more than its neighbor to the left.
+            */
+            else 
+            {
+                ++i;
+                group[i] = group[i - 1];
+            }
+        }
+        return result;
+    }
+
+private:
     
-    void dfs(int n, int k,int start,int count,vector<int> &group,vector<vector<int>> &result){
-        if(count ==k){
+    void dfs(int n, int k,int start,int count,vector<int> &group,vector<vector<int>> &result)
+    {
+        if(count ==k)
+        {
             result.push_back(group);
         }
-        else{
-            for(int i=start;i<=n;i++){
+        else
+        {
+            for(int i=start;i<=n;i++)
+            {
                 group.push_back(i);
                 dfs(n,k,i+1,count+1,group,result);
                 group.pop_back();
@@ -292,7 +340,7 @@ For example,
 Given:
 beginWord = "hit"
 endWord = "cog"
-wordList = ["hot","dot","dog","lot","log"]
+wordList = ["hot","dot","dog","lot","log","cog"]
 As one shortest transformation is "hit" -> "hot" -> "dot" -> "dog" -> "cog",
 return its length 5.
 
@@ -304,66 +352,86 @@ All words contain only lowercase alphabetic characters.
 
 class WordLadderSolution {
 public:
-    // wrong result 
-    int ladderLength(string beginWord, string endWord, unordered_set<string>& wordList) 
+    int ladderLength(string beginWord, string endWord, vector<string>&wordList) 
     {
-        int total=0;
-        bool bingo=false;
-        while(!bingo)
+        typedef struct path_info
         {
-            bool found = false;
-            for(auto iter = wordList.begin();iter!=wordList.end();iter++)
+            string str;
+            int    depth;
+        }path_info_type;
+
+        queue<path_info_type> visit_path;
+        
+        int curr_depth = 1;
+        bool found = false;
+
+        path_info_type path_info;
+        path_info.str = beginWord;
+        path_info.depth = curr_depth;
+        visit_path.push(path_info);
+
+        while (!visit_path.empty())
+        {
+            const string &curr_str = visit_path.front().str;
+            curr_depth = visit_path.front().depth;
+            if (curr_str == endWord)
             {
-                int count=0;
-                for(int i=0;i<beginWord.length();i++)
-                {
-                    if(beginWord[i]!=(*iter)[i]) 
-                        count++;
-                    if(count>1)
-                    {
-                        break;
-                    }
-                }
-                
-                if(count == 1)
-                {
-                    beginWord=*iter;
-                    total++;
-                    wordList.erase(iter);
-                    found = true;
-                    break;
-                }
-            }
-            if(bingo) 
-            {
+                found = true;
                 break;
             }
-            if(!found)
+            for (auto it = wordList.begin(); it != wordList.end();)
             {
-                total=0;
-                break;
+                if (IsLadderWord(curr_str, *it))
+                {
+                    path_info.str = *it;
+                    path_info.depth = curr_depth + 1;
+                    visit_path.push(path_info);
+                    it = wordList.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
             }
+            visit_path.pop();
         }
-        return total;
+        return found ? curr_depth : 0;
     }
-
-    static void Test()
+    
+    bool IsLadderWord(const string &str1, const string &str2)
     {
-        unordered_set<string> dict_set;
-        dict_set.insert("hot");
-        dict_set.insert("dot");
-        dict_set.insert("dog");
-        dict_set.insert("lot");
-        dict_set.insert("log");
-        string begin_word = "hit";
-        string end_word = "cog";
+        int diff_count = 0;
+        for(int i=0;i<str1.size();i++)
+        {
+            if(str1.at(i)!=str2.at(i))
+            {
+                diff_count++;
+                if(diff_count>1)
+                    break;
+            }    
+        }
+        return diff_count<2;
+    }
+    
+};
 
-        WordLadderSolution word_ladder_sln;
-        cout << "Dictionary:" << endl;
-        for_each(dict_set.cbegin(), dict_set.cend(), [](auto &val) { cout << val << " "; });
-        cout << endl << "From:" << begin_word << endl;
-        cout << "To:" << end_word << endl;
-        cout << "Step:" << word_ladder_sln.ladderLength(begin_word, end_word, dict_set) << endl;
+/*
+72. Edit Distance
+Given two words word1 and word2, find the minimum number of steps required to convert word1 to word2. 
+(each operation is counted as 1 step.)
+
+You have the following 3 operations permitted on a word:
+
+a) Insert a character
+b) Delete a character
+c) Replace a character
+*/
+
+class EditDistance{
+public:
+    int minDistance(string word1, string word2) 
+    {
+
     }
 };
 
