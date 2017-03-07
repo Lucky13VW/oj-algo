@@ -41,18 +41,7 @@ public:
             }
         }
     }
-    
-    static void Test()
-    {
-        int data[]={1,17,25,30,28,14,3,12,9,7,6,10,5,4,2,8};
-        int len = sizeof(data)/sizeof(int);
-        for(int i=0;i<len;i++) cout<<data[i]<<" ";
-        cout<<endl<<"Sorted:"<<endl;
-        BitmapSort bm;
-        bm.Sort(data,len);
-        for(int i=0;i<len;i++) cout<<data[i]<<" ";
-        cout<<endl;
-    }
+   
 };
 
 class MyGraph
@@ -384,30 +373,6 @@ public:
         }
     }
 
-    static void Test()
-    {
-        MyGraph graph;
-        graph.AddVertex("A",1);
-        graph.AddVertex("B",2);
-        graph.AddVertex("C",3);
-        graph.AddVertex("D",4);
-        graph.AddVertex("E",5);
-        graph.AddVertex("F",6);
-        graph.AddVertex("G",7);
-        graph.AddEdge("A","B");
-        graph.AddEdge("A","C");
-        graph.AddEdge("B","D");
-        graph.AddEdge("C","D");
-        graph.AddEdge("C","E");
-        graph.AddEdge("B","F");
-        graph.AddEdge("G","D");
-        graph.ShowEdges();
-        cout << "From A to E" << endl;
-        graph.SearchPath("A","E");
-        cout << "From E to F all paths" << endl;
-        graph.SearchPathAll("E","F");
-    }
-
 private:
     map<string, VertexPtr> Vertexes_;
     map<string, list<VertexPtr>> VertexAdjacents_;
@@ -525,7 +490,6 @@ public:
     }  
 };
 
-
 class BasicDP
 {
 public:
@@ -611,36 +575,6 @@ public:
         return lis_val[longest_index];
     }
 
-
-    static void TestKnapsack01()
-    {
-        const int array_size = 5;
-        int weight_arr[array_size] = {2,2,6,5,4};
-        int value_arr[array_size] = {6,3,5,4,6};
-        
-        vector<int> weight;
-        vector<int> value;
-
-        cout << "weight:" << endl;
-        for (int data : weight_arr)
-        {
-            weight.push_back(data);
-            cout << data << " ";
-        }
-        cout << endl << "value:" << endl;
-        for (int data : value_arr)
-        {
-            value.push_back(data);
-            
-            cout << data << " ";
-        }
-        cout << endl;
-        BasicDP dp;
-        int max = dp.Knapsack0_1(value, weight, 10);
-        cout << "total:10, max:" << max << endl;;
-        
-    }
-
     // 0-1 KnapSack 
     int Knapsack0_1(const vector<int> &value_tab, const vector<int> &weight_tab, int weight_limit)
     {
@@ -687,7 +621,102 @@ public:
 
         return max_value_tab[value_tab.size() - 1][weight_limit - 1];
     }
+};
 
+template<typename id_type,typename data_type>
+class MyBinaryTree
+{
+public:
+    typedef struct TN
+    {
+    public:
+        id_type id;
+        data_type data;
+        TN *left;
+        TN *right;
+        TN(id_type in_id, data_type in_data) :
+            id(in_id),
+            data(in_data),
+            left(nullptr),
+            right(nullptr){}
+        ~TN() = default;
+    }TreeNode;
+
+    typedef enum
+    {
+        left_child,
+        right_child
+    }ChildType;
+    typedef shared_ptr<TreeNode> SharedPtrTreeNode;
+
+public:
+    TreeNode* AddTreeNode(id_type in_id, data_type in_data, TreeNode *parent=nullptr, ChildType child_type = left_child)
+    {
+        auto ptn = make_shared<TreeNode>(in_id, in_data);
+        _tree.insert(pair<id_type, SharedPtrTreeNode>(in_id, ptn));
+        if (parent)
+        {
+            if (child_type == left_child) parent->left = ptn.get();
+            else parent->right = ptn.get();
+        }
+        return ptn.get();
+    }
+    
+    bool AddChild(id_type parent_id, id_type child_id, ChildType child_type = left_child)
+    {
+        auto p_parent = _tree.find(parent_id);
+        auto p_child = _tree.find(child_id);
+        if (p_parent == _tree.end() || p_child == _tree.end()) return false;
+
+        AddChild(p_parent->second.get(),p_child->second.get(),child_type);
+        return true;
+    }
+
+    void AddChild(TreeNode *parent, TreeNode *child, ChildType child_type = left_child)
+    {
+        if (parent)
+        {
+            if (child_type == left_child) parent->left = child;
+            else parent->right = child;
+        }
+    }
+
+    TreeNode* FindNode(id_type id)
+    {
+        auto ptn = _tree.find(id);
+        if (ptn != _tree.end()) return ptn->second.get();
+        else return null;
+    }
+
+private:
+    map<id_type, SharedPtrTreeNode> _tree;
+};
+
+template<typename id_type, typename data_type>
+class LCA
+{
+    typedef MyBinaryTree<id_type, data_type>::TreeNode TreeNode;
+    
+public:
+   
+    // return lowest common ancestor
+    TreeNode *BruteRecursive(TreeNode *current, TreeNode *node1, TreeNode *node2)
+    {
+        if (current == nullptr) return nullptr;
+        if (current == node1 || current == node2) return current;
+
+        TreeNode *left = BruteRecursive(current->left, Node1, node2);
+        TreeNode *right = BruteRecursive(current->right, Node1, node2);
+
+        if (left != nullptr && right != nullptr) 
+            return current;
+        else if (left != nullptr) 
+            return left;
+        else if (right != nullptr) 
+            return right;
+        return 
+            nullptr;
+    }
 };
 
 #endif
