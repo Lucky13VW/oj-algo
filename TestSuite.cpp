@@ -114,15 +114,19 @@ static void TestBinaryTreeLCA()
     BinaryTree.AddTreeNode("E", 4);
     BinaryTree.AddTreeNode("F", 5);
 
-    BinaryTree.AddChild("A", "B", TreeType::right_child);
-    BinaryTree.AddChild("C", "D", TreeType::left_child);
-    BinaryTree.AddChild("C", "E", TreeType::right_child);
-    BinaryTree.AddChild("E", "F", TreeType::left_child);
+    BinaryTree.AddChild("A", "C", TreeType::ChildRight);
+    BinaryTree.AddChild("C", "D", TreeType::ChildLeft);
+    BinaryTree.AddChild("C", "E", TreeType::ChildRight);
+    BinaryTree.AddChild("E", "F", TreeType::ChildLeft);
     
+    BinaryTree.TraversePreOrder(root, [](auto val) { cout << val->id << val->data << " "; });
+    cout << endl;
     LCAType lca_algo;
-    auto result = lca_algo.BruteRecursive(root,BinaryTree.FindNode("D"),BinaryTree.FindNode("F"));
+
+    string node1 = "C", node2 = "D";
+    auto result = lca_algo.BruteRecursive(root,BinaryTree.FindNode(node1),BinaryTree.FindNode(node2));
     if (result == nullptr) cout << " failed to find LCA" << endl;
-    else cout << "LCA:" << result->id << " " << result->data << endl;
+    else cout << "LCA("<< node1 << "," << node2 << "): " << result->id << " " << result->data << endl;
 
 }
 

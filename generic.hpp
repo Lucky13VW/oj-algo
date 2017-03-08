@@ -11,6 +11,7 @@
 #include <stack>
 #include <queue>
 #include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -624,45 +625,50 @@ public:
 };
 
 template<typename id_type,typename data_type>
-class MyBinaryTree
+struct TreeNode
 {
 public:
-    typedef struct TN
-    {
-    public:
-        id_type id;
-        data_type data;
-        TN *left;
-        TN *right;
-        TN(id_type in_id, data_type in_data) :
-            id(in_id),
-            data(in_data),
-            left(nullptr),
-            right(nullptr){}
-        ~TN() = default;
-    }TreeNode;
+    id_type id;
+    data_type data;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(id_type in_id, data_type in_data) :
+        id(in_id),
+        data(in_data),
+        left(nullptr),
+        right(nullptr) {}
+    ~TreeNode() = default;
+};
+
+template<typename id_type, typename data_type>
+class MyBinaryTree
+{
+    typedef TreeNode<id_type, data_type> BinaryTreeNode;
+    typedef shared_ptr<BinaryTreeNode> SharedPtrTreeNode;
+    typedef function< void(BinaryTreeNode*)> VisitFunc;
+public:
 
     typedef enum
     {
-        left_child,
-        right_child
+        ChildLeft,
+        ChildRight
     }ChildType;
-    typedef shared_ptr<TreeNode> SharedPtrTreeNode;
 
 public:
-    TreeNode* AddTreeNode(id_type in_id, data_type in_data, TreeNode *parent=nullptr, ChildType child_type = left_child)
+    
+    BinaryTreeNode* AddTreeNode(id_type in_id, data_type in_data, BinaryTreeNode *parent=nullptr, ChildType child_type = ChildLeft)
     {
-        auto ptn = make_shared<TreeNode>(in_id, in_data);
+        auto ptn = make_shared<BinaryTreeNode>(in_id, in_data);
         _tree.insert(pair<id_type, SharedPtrTreeNode>(in_id, ptn));
         if (parent)
         {
-            if (child_type == left_child) parent->left = ptn.get();
+            if (child_type == ChildLeft) parent->left = ptn.get();
             else parent->right = ptn.get();
         }
         return ptn.get();
     }
     
-    bool AddChild(id_type parent_id, id_type child_id, ChildType child_type = left_child)
+    bool AddChild(id_type parent_id, id_type child_id, ChildType child_type = ChildLeft)
     {
         auto p_parent = _tree.find(parent_id);
         auto p_child = _tree.find(child_id);
@@ -672,20 +678,28 @@ public:
         return true;
     }
 
-    void AddChild(TreeNode *parent, TreeNode *child, ChildType child_type = left_child)
+    void AddChild(BinaryTreeNode *parent, BinaryTreeNode *child, ChildType child_type = ChildLeft)
     {
         if (parent)
         {
-            if (child_type == left_child) parent->left = child;
+            if (child_type == ChildLeft) parent->left = child;
             else parent->right = child;
         }
     }
 
-    TreeNode* FindNode(id_type id)
+    BinaryTreeNode* FindNode(id_type id)
     {
         auto ptn = _tree.find(id);
         if (ptn != _tree.end()) return ptn->second.get();
-        else return null;
+        else return nullptr;
+    }
+
+    void TraversePreOrder(BinaryTreeNode* root, VisitFunc visit_func)
+    {
+        if (root == nullptr) return;
+        visit_func(root);
+        TraversePreOrder(root->left,visit_func);
+        TraversePreOrder(root->right, visit_func);
     }
 
 private:
@@ -695,18 +709,17 @@ private:
 template<typename id_type, typename data_type>
 class LCA
 {
-    typedef MyBinaryTree<id_type, data_type>::TreeNode TreeNode;
-    
+    typedef TreeNode<id_type, data_type> BinaryTreeNode;
+
 public:
-   
     // return lowest common ancestor
-    TreeNode *BruteRecursive(TreeNode *current, TreeNode *node1, TreeNode *node2)
+    BinaryTreeNode *BruteRecursive(BinaryTreeNode *current, BinaryTreeNode *node1, BinaryTreeNode *node2)
     {
         if (current == nullptr) return nullptr;
         if (current == node1 || current == node2) return current;
 
-        TreeNode *left = BruteRecursive(current->left, Node1, node2);
-        TreeNode *right = BruteRecursive(current->right, Node1, node2);
+        BinaryTreeNode *left = BruteRecursive(current->left, node1, node2);
+        BinaryTreeNode *right = BruteRecursive(current->right, node1, node2);
 
         if (left != nullptr && right != nullptr) 
             return current;
