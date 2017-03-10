@@ -130,9 +130,30 @@ static void TestBinaryTreeLCA()
 
 }
 
+static void TestGrayCode()
+{
+    int n = 3;
+    GrayCode gray_code;
+    vector<int> &&result = gray_code.Solution(n);
+    
+    for_each(result.begin(), result.end(), [&](auto val) 
+    { 
+        int index = 1 << (n-1);
+        for (int i = 0; i < n; i++)
+        {
+            int out_put = 0;
+            if ((index & val) > 0) out_put = 1;
+            cout << out_put;
+            index = index >> 1;
+        } 
+        cout << endl;
+    });
+}
+
 int main(int argc,char *argv[])
 {
-    TestBinaryTreeLCA();
+    TestGrayCode();
+    //TestBinaryTreeLCA();
     //TestCombineKoutofN();
     //TestWordLadder();
     //TestMyGraph();
