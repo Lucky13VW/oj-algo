@@ -455,7 +455,45 @@ class EditDistance{
 public:
     int minDistance(string word1, string word2) 
     {
+        const size_t size1 = word1.size();
+        const size_t size2 = word2.size();
 
+        vector<vector<int>> dist_matrix;
+        // initialize matirx
+        for (int i = 0; i <= size1; i++)
+        {
+            vector<int> temp;
+            for (int j = 0; j <= size2; j++)
+            {
+                temp.push_back(0);
+            }
+            dist_matrix.push_back(temp);
+        }
+        
+        for (int j = 0; j <= size2; j++)
+            dist_matrix[0][j] = j;
+        for (int i = 0; i <= size1; i++)
+            dist_matrix[i][0] = i;
+
+        for (int i = 1; i <= size1; i++)
+        {
+            for (int j = 1; j <= size2; j++)
+            {
+                if (word1.at(i - 1) == word2[j - 1])
+                {
+                    // f[i][j] = f[i-1][j-1]
+                    dist_matrix[i][j] = dist_matrix[i - 1][j - 1];
+                }
+                else
+                {
+                    // min(f[i-1][j]+1,f[i][j-1]+1,f[i-1][j-1]+1)
+                    int min_step = min(dist_matrix[i - 1][j], dist_matrix[i][j - 1]);
+                    dist_matrix[i][j] = min(min_step, dist_matrix[i - 1][j - 1]) + 1;
+                }
+            }
+        }
+
+        return dist_matrix[size1][size2];
     }
 };
 

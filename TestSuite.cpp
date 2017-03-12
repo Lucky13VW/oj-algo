@@ -150,9 +150,23 @@ static void TestGrayCode()
     });
 }
 
+static void TestEditDistance()
+{
+    EditDistance sln;
+    string str1 = "abc";
+    string str2 = "ebcf";
+    int dist = sln.minDistance(str1,str2);
+    cout << "Str1: " << str1 << endl;
+    cout << "Str2: " << str2 << endl;
+    cout <<"MinDist:" << dist << endl;
+}
+
 int main(int argc,char *argv[])
 {
-    TestGrayCode();
+    PowSqrSolution sln;
+    sln.SqrtBinarySearch(6);
+    //TestEditDistance();
+    //TestGrayCode();
     //TestBinaryTreeLCA();
     //TestCombineKoutofN();
     //TestWordLadder();

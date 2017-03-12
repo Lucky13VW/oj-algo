@@ -15,6 +15,65 @@
 
 using namespace std;
 
+class PowSqrSolution {
+public:
+    double Pow(double x, int n)
+    {
+        double result = 1.0;
+        if (n == 0) return result;
+        // x^n = x^(n/2)*x^(n/2)*x^(n%2)
+        for (int i = n; i != 0; i /= 2)
+        {
+            if (i % 2 != 0)
+                result *= x;
+            x *= x;
+        }
+
+        return n>0 ? result : (1.0 / result);
+    }
+
+    int SqrtNewtonIteration(int x)
+    {
+        //x(n+1)=x(n)-f(x(n))/f'(x(n))
+        //x(n+1)=x(n)-(x^2-n)/2x
+        // xn1 = (x+n/x)/2
+        if (x == 0) return 0;
+        const double EPSIL = 0.001;
+        double xn = 0.0, xn1 = 1.0;
+        while (abs(xn1 - xn)>EPSIL)
+        {
+            xn = xn1;
+            xn1 = (xn + x / xn) / 2.0;
+        }
+        return xn1;
+    }
+
+    int SqrtBinarySearch(int x)
+    {
+        if (x<2) return x;
+
+        int begin = 1, end = x / 2;
+        int middle = 0, last_middle = 0;
+        while (begin <= end)
+        {
+            middle = begin + (end - begin) / 2;
+            int guess = x / middle;
+            if (middle == guess) return middle;
+
+            if (middle < guess)
+            {
+                begin = middle + 1;
+                last_middle = middle;
+            }
+            else
+            {
+                end = middle - 1;
+            }
+        }
+        return last_middle;
+    }
+};
+
 /*
   Count sort,big O is n,  bitmap sort is to save memory 
 */
