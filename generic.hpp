@@ -15,6 +15,32 @@
 
 using namespace std;
 
+struct ListNode
+{
+    int val;
+    ListNode *next;
+    ListNode(int x)
+        : val(x), next(NULL) {}
+};
+
+class BasicList {
+public:
+    ListNode* ReverseList(ListNode* head) 
+    {
+        ListNode *curr = head;
+        ListNode *prev = NULL;
+        ListNode *next = NULL;
+        while(curr)
+        {
+            next = curr->next;
+            curr->next =  prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+};
+
 class PowSqrSolution {
 public:
     double Pow(double x, int n)
