@@ -815,6 +815,19 @@ public:
         return 
             nullptr;
     }
+
+    BinaryTreeNode* BinarySearchTree(BinaryTreeNode *root, BinaryTreeNode *node1, BinaryTreeNode *node2) 
+    {
+        if(root == nullptr || node1==nullptr || node2==nullptr) 
+            return nullptr;
+        
+        if(root->data > node1->data && root->data > node2->data) 
+            return BinarySearchTree(root->left,node1,node2);
+        if(root->data < node1->data && root->data < node2->data) 
+            return BinarySearchTree(root->right,node1,node2);
+        else 
+            return root;
+    }
 };
 
 #endif
