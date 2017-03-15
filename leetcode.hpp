@@ -552,5 +552,75 @@ public:
         return count;
     }
 };
+/*
+138. Copy List with Random Pointer
+A linked list is given such that each node contains an additional random pointer 
+which could point to any node in the list or null.
+Return a deep copy of the list.
+*/
+struct RandomListNode
+{
+    int label;
+    RandomListNode *next, *random;
+    RandomListNode(int x) : label(x), next(NULL), random(NULL) {}
+};
+class CopyRandomList
+{
+public:
+    RandomListNode *CopyList(RandomListNode *head)
+    {
+        if (head == NULL) return NULL;
+        RandomListNode *curr = head;
+        RandomListNode *new_node = NULL;
+        RandomListNode *next_node = NULL;
+        RandomListNode *new_head = NULL;
+        // added new node after old one 
+        // old1->new1->old2->new2
+        while (curr)
+        {
+            new_node = new RandomListNode(curr->label);
+            next_node = curr->next;
+            curr->next = new_node;
+            new_node->next = next_node;
+            curr = next_node;
+        }
+        // modify random for new old
+        curr = head;
+        while (curr)
+        {
+            new_node = curr->next;
+            new_node->random = curr->random == NULL ? NULL : curr->random->next;
 
+            curr = new_node->next;
+        }
+        // split old/new nodes
+        curr = head;
+        while (curr)
+        {
+            new_node = curr->next;
+            if (new_head == NULL)
+                new_head = new_node;
+
+            curr->next = new_node->next;
+            curr = new_node->next;
+            new_node->next = curr == NULL ? NULL : curr->next;
+        }
+        return new_head;
+    }
+};
+
+/*
+171. Excel Sheet Column Number
+*/
+int titleToNumber(string s)
+{
+    int number = 0;
+    for (auto val : s)
+    {
+        char c_digit = toupper(val);
+        int n_digit = c_digit - 'A' + 1;
+        number = number * 26 + n_digit;
+    }
+    return number;
+}
 #endif

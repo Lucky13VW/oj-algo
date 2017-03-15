@@ -161,10 +161,40 @@ static void TestEditDistance()
     cout <<"MinDist:" << dist << endl;
 }
 
+static void TestRandomList()
+{
+    RandomListNode *head = NULL,*curr=NULL;
+    RandomListNode *node1 = new RandomListNode(1);
+    RandomListNode *node2 = new RandomListNode(2);
+    node1->next = node2;
+    RandomListNode *node3 = new RandomListNode(3);
+    node2->next = node3;
+    RandomListNode *node4 = new RandomListNode(4);
+    node3->next = node4;
+    node3->random = node3;
+    node2->random = node4;
+    function<void()> func_print = [&]() 
+    {
+        while (curr)
+        {
+            cout << curr->label << ":" << (curr->random == NULL ? -1:curr->random->label) << " ";
+            curr = curr->next;
+        }
+    };
+    head = node1;
+    curr = head;
+    func_print();
+    cout << endl;
+    CopyRandomList sln;
+    RandomListNode *new_head = sln.CopyList(head);
+    curr = new_head;
+    func_print();
+    cout << endl;
+}
+
 int main(int argc,char *argv[])
 {
-    PowSqrSolution sln;
-    sln.SqrtBinarySearch(6);
+    TestRandomList();
     //TestEditDistance();
     //TestGrayCode();
     //TestBinaryTreeLCA();
@@ -173,5 +203,6 @@ int main(int argc,char *argv[])
     //TestMyGraph();
     //TestKnapsack01();
     ::getchar();
+    
     return 0;
 }
