@@ -111,9 +111,75 @@ public:
     }
 };
 
-/*
-8. String to Integer (atoi)
-*/
+// 3. Longest Substring Without Repeating Characters
+class LongestSubstringWithoutRepeating {
+public:
+    int LengthOfSubstring(string s)
+    {
+        if (s.size() == 0) return 0;
+
+        map<char, int> char_set;
+        char_set.insert(pair<char, int>(s.at(0), 0));
+        // greedy algo?
+        int index = 1, max_len = 1, result = 1;
+        while (index<s.size())
+        {
+            char curr = s.at(index);
+            auto it = char_set.find(curr);
+            if (it == char_set.end())
+            {
+                char_set[curr] = index;
+                if (++max_len>result)
+                    result = max_len;
+
+                index++;
+            }
+            else
+            {
+                max_len = 0;
+                index = it->second + 1;
+                char_set.clear();
+            }
+        }
+        return result;
+    }
+};
+
+// 5. Longest Palindromic Substring 
+class LongestPalindrome
+{
+public:
+    string BrutalWay(string s)
+    {
+        if (s.size()<2) return s;
+        int max_start = 0, max_len = 0;
+        for (int i = 1; i<s.size(); i++)
+        {
+            function<void(int, int)> check_functor = [&](int start, int end)
+            {
+                while (start >= 0 && end<s.size() && s.at(start) == s.at(end))
+                {
+                    start--;
+                    end++;
+                }
+                if (end - start - 1>max_len)
+                {
+                    max_len = end - start - 1;
+                    max_start = start + 1;
+                }
+            };
+            // check for odd
+            check_functor(i - 1, i + 1);
+            // check for even
+            check_functor(i - 1, i);
+        }
+
+        return s.substr(max_start, max_len);
+    }
+
+};
+
+// 8. String to Integer (atoi)
 class MyAtoiSolution {
 public:
     int myAtoi(string str) 
@@ -143,20 +209,7 @@ public:
 44. Wildcard Matching
 '?' Matches any single character.
 '*' Matches any sequence of characters (including the empty sequence).
-
 The matching should cover the entire input string (not partial).
-
-The function prototype should be:
-bool isMatch(const char *s, const char *p)
-
-Some examples:
-isMatch("aa","a") ¡ú false
-isMatch("aa","aa") ¡ú true
-isMatch("aaa","aa") ¡ú false
-isMatch("aa", "*") ¡ú true
-isMatch("aa", "a*") ¡ú true
-isMatch("ab", "?*") ¡ú true
-isMatch("aab", "c*a*b") ¡ú false
 */
 
 class WildCardMatch
@@ -164,7 +217,123 @@ class WildCardMatch
 public:
     bool IsMatch(string s, string p)
     {
-        
+        int p_index = 0;
+        int s_index = 0;
+        int star_index = -1;
+        int star_matched = 0;
+        while (s_index<s.size())
+        {
+            if (p_index<p.size() && (p.at(p_index) == s.at(s_index) || p.at(p_index) == '?'))
+            {
+                p_index++;
+                s_index++;
+            }
+            else if (p_index<p.size() && p.at(p_index) == '*')
+            {
+                // s_index meets *
+                star_index = ++p_index;
+                star_matched = s_index;
+            }
+            else if (star_index != -1)
+            {
+                // it's under * mode
+                p_index = star_index;
+                s_index = ++star_matched;
+            }
+            else return false;
+        }
+
+        while (p_index<p.size() && p.at(p_index) == '*') p_index++;
+        return p_index == p.size();
+    }
+};
+
+/*
+48. Rotate Image
+*/
+class RotateImage 
+{
+public:
+    void MirrorFlip(vector<vector<int>>& matrix)
+    {
+        int n = matrix.size();
+        // diagonal ¡¯/¡®
+        for (int i = 0; i<n - 1; i++)
+        {
+            for (int j = 0; j<n - i; j++)
+            {
+                swap(matrix[i][j], matrix[n - j - 1][n - i - 1]);
+            }
+        }
+
+        // horizal '-'
+        for (int i = 0; i<n / 2; i++)
+        {
+            for (int j = 0; j<n; j++)
+            {
+                swap(matrix[i][j], matrix[n - i - 1][j]);
+            }
+        }
+    }
+
+    void DirectLyMove(vector<vector<int>> &matrix)
+    {
+        int n = matrix.size();
+        for (int layer = 0; layer<n / 2; layer++)
+        {
+            int end = n - layer - 1;
+            // only move n-1
+            for (int i = layer; i<end; i++)
+            {
+                int offset = n - i - 1;
+                // save top
+                int temp = matrix[layer][i];
+                // move left to top
+                matrix[layer][i] = matrix[offset][layer];
+                // move bottom to left
+                matrix[offset][layer] = matrix[end][offset];
+                // move right to bottom
+                matrix[end][offset] = matrix[i][end];
+                // move top to right
+                matrix[i][end] = temp;
+            }
+        }
+    }
+};
+
+/*
+54. Spiral Matrix
+Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
+*/
+class SpiralMatrix
+{
+public:
+    vector<int> SpiralOrder(vector<vector<int>> &matrix)
+    {
+        vector<int> result;
+        if (matrix.size() == 0) return result;
+
+        int x_begin = 0, x_end = matrix[0].size() - 1;
+        int y_begin = 0, y_end = matrix.size() - 1;
+        while (true)
+        {
+            // copy top line, left to right
+            for (int i = x_begin; i <= x_end; i++) result.push_back(matrix[y_begin][i]);
+            if (++y_begin > y_end) break;
+
+            // copy rigt line, top to bottom
+            for (int i = y_begin; i <= y_end; i++) result.push_back(matrix[i][x_end]);
+            if (--x_end < x_begin) break;
+
+            // copy bottom line, right to left
+            for (int i = x_end; i >= x_begin; i--) result.push_back(matrix[y_end][i]);
+            if (--y_end < y_begin) break;
+
+            // copy left line, bottom to top
+            for (int i = y_end; i >= y_begin; i--) result.push_back(matrix[i][x_begin]);
+            if (++x_begin > x_end) break;
+        }
+        return result;
     }
 };
 
