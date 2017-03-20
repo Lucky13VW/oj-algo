@@ -792,4 +792,67 @@ int titleToNumber(string s)
     }
     return number;
 }
+
+/*
+200. Number of Islands
+*/
+class NumberOfIslands
+{
+public:
+    int CountIslands(vector<vector<char>>& grid)
+    {
+        if (grid.size() == 0) return 0;
+
+        int nums = 0;
+        int x_len = grid.size();
+        int y_len = grid[0].size();
+
+        for (int i = 0; i<x_len; i++)
+        {
+            for (int j = 0; j<y_len; j++)
+            {
+                if (grid[i][j] == '1')
+                {
+                    BFS(i, j, grid);
+                    nums++;
+                }
+            }
+        }
+        return nums;
+    }
+
+    void BFS(int i, int j, vector<vector<char>>&grid)
+    {
+        struct point
+        {
+            point(int i, int j) :
+                x(i), y(j) {}
+            ~point() = default;
+            int x;
+            int y;
+        };
+        int x_max = grid.size();
+        int y_max = grid[0].size();
+        queue<point> path;
+        path.push(point(i, j));
+        while (!path.empty())
+        {
+            point xy = path.front();
+            path.pop();
+            i = xy.x;
+            j = xy.y;
+            grid[i][j] = '0';
+            // check xy's adjacent
+            function<void(int, int)> processor = [&](int x, int y)
+            { if (grid[x][y] == '1') {
+                path.push(point(x, y)); grid[x][y] = '2';
+            }
+            };
+            if (i>0) processor(i - 1, j);
+            if (j>0) processor(i, j - 1);
+            if (i < x_max - 1) processor(i + 1, j);
+            if (j < y_max - 1) processor(i, j + 1);
+        }
+    }
+};
 #endif

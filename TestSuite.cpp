@@ -192,9 +192,44 @@ static void TestRandomList()
     cout << endl;
 }
 
+void TestNumberOfIslands()
+{
+    vector<string> input
+    { "11111011111111101011","01111111111110111110","10111001101111111111","11110111111111111111",
+    "10011111111111111111","10111111011101110111","01111111111101101111","11111111111101111011",
+    "11111111110111111111","11111111111111111111","01111111011111111111","11111111111111111111",
+    "11111111111111111111","11111011111110111111","10111110111011110111","11111111111101111110",
+    "11111111111110111100","11111111111111111111","11111111111111111111","11111111111111111111" };
+
+    NumberOfIslands sln;
+    vector<vector<char>> grid;
+    function<void(const string &)> proc = [&](auto str) 
+    { 
+        vector<char> line;
+        for (auto c : str)
+        {
+            line.push_back(c);
+            cout << c;
+        }
+        grid.push_back(line); 
+        cout << endl;
+    };
+    
+    for(auto &val: input)
+        proc(val);
+    
+    cout << "Islands:" <<sln.CountIslands(grid) << endl;
+    for (int i = 0; i < grid.size(); i++)
+    {
+        for (int j = 0; j < grid[0].size(); j++) cout << grid[i][j];
+        cout << endl;
+    }
+}
+
 int main(int argc,char *argv[])
 {
-    TestRandomList();
+    TestNumberOfIslands();
+    //TestRandomList();
     //TestEditDistance();
     //TestGrayCode();
     //TestBinaryTreeLCA();

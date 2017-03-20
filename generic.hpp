@@ -384,7 +384,7 @@ private:
         }
     }
 
-    // BFS based on a queue, find the shortest path
+    // !!! not right BFS based on a queue, find the shortest path
     bool BFS(const string &from_id, const string &des_id, vector<string> &path)
     {
         typedef struct search_info
