@@ -248,6 +248,41 @@ public:
     }
 };
 
+/* 
+46. Permutations 
+Given a collection of distinct numbers, return all possible permutations.
+*/
+class Permutation
+{
+public:
+    vector<vector<int>> permute(vector<int>& nums)
+    {
+        vector<vector<int>> result;
+        if (nums.size() == 0) return result;
+
+        FullPermute(result, nums,0);
+        return result;
+    }
+
+private:
+    void FullPermute(vector<vector<int>> &result, vector<int>& nums, int start)
+    {
+        if (start == nums.size())
+        {
+            result.push_back(nums);
+            return;
+        }
+        
+        for (int i = start; i<nums.size(); i++)
+        {
+            // P[i] = P[i] + P[i+1,N]
+            swap(nums[start],nums[i]);
+            FullPermute(result, nums, start + 1);
+            swap(nums[start], nums[i]);
+        }
+    }
+};
+
 /*
 48. Rotate Image
 */
@@ -299,6 +334,68 @@ public:
             }
         }
     }
+};
+
+/*
+N Queens
+*/
+class NQueens 
+{
+public:
+    vector<vector<string>> Solve(int n)
+    {
+        if (n == 0) return result_;
+
+        vector<string> one_sln(n, string(n, '.'));
+        DFS(one_sln, 0);
+        return result_;
+    }
+
+private:
+    void DFS(vector<string> &one_sln, int row)
+    {
+        if (row == one_sln.size())
+        {
+            result_.push_back(one_sln);
+        }
+
+        // goes row by row, full permutate in each row
+        for (int col = 0; col< one_sln.size(); col++)
+        {
+            // check each col |, diagonal '/' '\'
+            if(IsValid(one_sln,row,col))
+            {
+                one_sln[row][col] = 'Q';
+                DFS(one_sln, row + 1);
+                //backtracking, remove previous step
+                one_sln[row][col] = '.';
+            }
+        }
+    }
+
+    bool IsValid(vector<string> &one_sln, int row, int col)
+    {
+        // check columns
+        for (int i = 0; i<row; i++)
+        {
+            if (one_sln[i][col] == 'Q') return false;
+        }
+
+        // check diagonal '\'
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--)
+        {
+            if (one_sln[i][j] == 'Q') return false;
+        }
+
+        // check  diagonal '/'
+        for (int i = row - 1, j = col + 1; i >= 0 && j <= one_sln.size(); i--, j++)
+        {
+            if (one_sln[i][j] == 'Q') return false;
+        }
+        return true;
+    }
+
+    vector<vector<string>> result_;
 };
 
 /*
@@ -458,7 +555,7 @@ Output: 0
 In this case, no transaction is done, i.e. max profit = 0.
 */
 
-class BestTimeStock1Solution
+class BestTimeStockSolution
 {
 public:
     vector<int> MaxProfit(vector<int> &prices)
@@ -489,18 +586,6 @@ public:
         best.push_back(best_buy_time);best.push_back(best_sell_time);best.push_back(max_profit);
         return best;  
     }
-    
-    static void Test()
-    {
-        int data[15] = {9989,9992,9998,9997,9991,9925,9994,9993,9992,9999,9990,9989,9988,9987,9986};
-        vector<int> prices;
-        for (int i=0;i<15;i++)
-            prices.push_back(data[i]);
-
-        BestTimeStock1Solution best1;
-        vector<int> besttime=best1.MaxProfit(prices);
-        cout<<besttime[0]<<","<<besttime[1]<<","<<besttime[2]<<endl;
-    }
 };
 
 class BestTimeSellStockIII
@@ -508,44 +593,8 @@ class BestTimeSellStockIII
 public:    
     int maxProfit(vector<int> &prices)
     {
-        if(prices.size() ==  0) return 0;
-
-        int max_profit=0;
-
-        for(int i=0;i<prices.size();i++)
-        {
-            max_profit = max(FindMax(prices,0,i)+FindMax(prices,i,prices.size()-1),max_profit);
-        }
-        return max_profit;
+        
     }
-    
-private:
-    int FindMax(vector<int> &prices,int start, int end)
-    {
-        if(start == end) return 0;
-
-        int max_profit = 0, try_buy_price = prices[start];
-        for(int i=start+1;i<end+1;i++)
-        {
-            max_profit = max(prices[i]-try_buy_price,max_profit);
-            try_buy_price = min(prices[i],try_buy_price);
-        }
-        return max_profit;
-    }
-
-public:
-    static void Test()
-    {
-        int data[8]={3,5,9,4,7,6,7,8};
-        vector<int> prices;
-        for(int i=0;i<8;i++)
-            prices.push_back(data[i]);
-
-        BestTimeSellStockIII best;
-        cout<<best.maxProfit(prices)<<endl;
-    }
-
-    
 };
 
 

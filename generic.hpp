@@ -23,7 +23,8 @@ struct ListNode
         : val(x), next(NULL) {}
 };
 
-class BasicList {
+class BasicList 
+{
 public:
     ListNode* ReverseList(ListNode* head) 
     {
@@ -41,7 +42,8 @@ public:
     }
 };
 
-class PowSqrSolution {
+class PowSqrSolution 
+{
 public:
     double Pow(double x, int n)
     {
@@ -130,6 +132,59 @@ public:
    
 };
 
+  /*
+  BFS(G, s)
+    for each vertex u from G.V - {s}
+        u.color = WHITE
+        u.dist = infinit
+        u.node = NIL
+    s.color = GRAY
+    s.dist = 0
+    s.prev = NIL
+    Q = 0
+    ENQUEUE(Q,s)
+    while Q != 0
+        u = DEQUEUE(Q)
+        for each v from u.adj[]
+            if v.color == WHITE
+                v.color = GRAY
+                v.dist = u.dist + 1
+                v.prev = u
+                ENQUEUE(Q,v) 
+        u.color = BLACK
+
+  DFS(G)
+    for each vertex u from G.v - {s}
+        u.color = WHITE
+        u.prev = NIL
+    time_ = 0
+    for each vertex u from G.v
+        if u.color == WHITE
+            DFS-VISIT(G,u)
+
+  DFS-VISIT(G,u,time)
+    time_ ++
+    u.discove_time = time
+    u.color = GRAY
+    for each v from u.adj[]
+        if v.color == WHITE
+            v.prev = u
+            DFS-VISIT(G,v,time)
+    u.color = BLACK
+    time_++
+    u.finish_time = time_
+    //for topological sort
+    Add u onto front of topology list 
+
+  // print path s to v
+  PRINT-PATH(G,s,v) 
+    if v == s
+        print s
+    else if v.prev == NIL
+        print ¡°no path from¡± s ¡°to¡± v ¡°exists¡±
+    else PRINT-PATH(G,s,v.prev)
+        print v
+    */
 class MyGraph
 {
     struct Vertex
@@ -384,6 +439,7 @@ private:
         }
     }
 
+   
     // !!! not right BFS based on a queue, find the shortest path
     bool BFS(const string &from_id, const string &des_id, vector<string> &path)
     {
@@ -569,7 +625,7 @@ public:
     static void Test()
     {
         const int count = 3;
-        int data[count]={1,2,2};
+        int data[count]={1,2,3};
         Permutate per;
         per.TotalP(data,count,0,3);
         //per.TotalPStl(data,count);
@@ -579,23 +635,6 @@ public:
 class BasicDP
 {
 public:
-    static void TestLIS()
-    {
-        int arr[] = {3,8,4,8,4,6};
-        vector<int>  input;
-        for (int val : arr)
-        {
-            cout << val << " ";
-            input.push_back(val);
-        }
-        cout << endl;
-        BasicDP dp;
-        cout << dp.LIS(input) << endl;
-        vector<int> output = dp.LISVector(input);
-        for_each(output.cbegin(), output.cend(), [](auto val) { cout << val << " ";  });
-        cout << endl;
-    }
-
     // longest increasing subsequence O(N^2)
     int LIS(const vector<int> &input)
     {

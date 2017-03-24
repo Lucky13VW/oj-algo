@@ -1,6 +1,20 @@
 #include "generic.hpp"
 #include "leetcode.hpp"
 
+static void TestPermutation()
+{
+    Permutation sln;
+    vector<int> input{1,2,3,4};
+    vector<vector<int>> &&result = sln.permute(input);
+    for_each(result.begin(), result.end(), [](auto &val)
+    {
+        for_each(val.begin(), val.end(), [](auto num) {
+            cout << num << " ";
+        });
+        cout << endl;
+    });
+}
+
 static void TestBitmapSort()
 {
     int data[] = { 1,17,25,30,28,14,3,12,9,7,6,10,5,4,2,8 };
@@ -26,7 +40,36 @@ static void TestCombineKoutofN()
     });
 }
 
-static void TestKnapsack01()
+static void TestBestTimeStockSolution()
+{
+    int data[15] = { 9989,9992,9998,9997,9991,9925,9994,9993,9992,9999,9990,9989,9988,9987,9986 };
+    vector<int> prices;
+    for (int i = 0; i<15; i++)
+        prices.push_back(data[i]);
+
+    BestTimeStockSolution best1;
+    vector<int> besttime = best1.MaxProfit(prices);
+    cout << besttime[0] << "," << besttime[1] << "," << besttime[2] << endl;
+}
+
+static void TestDP_LIS()
+{
+    int arr[] = { 3,8,4,8,4,6 };
+    vector<int>  input;
+    for (int val : arr)
+    {
+        cout << val << " ";
+        input.push_back(val);
+    }
+    cout << endl;
+    BasicDP dp;
+    cout << dp.LIS(input) << endl;
+    vector<int> output = dp.LISVector(input);
+    for_each(output.cbegin(), output.cend(), [](auto val) { cout << val << " ";  });
+    cout << endl;
+}
+
+static void TestDP_Knapsack01()
 {
     const int array_size = 5;
     int weight_arr[array_size] = { 2,2,6,5,4 };
@@ -98,8 +141,6 @@ static void TestMyGraph()
     cout << "From E to F all paths" << endl;
     graph.SearchPathAll("E", "F");
 }
-
-
 
 static void TestBinaryTreeLCA()
 {
@@ -192,7 +233,7 @@ static void TestRandomList()
     cout << endl;
 }
 
-void TestNumberOfIslands()
+static void TestNumberOfIslands()
 {
     vector<string> input
     { "11111011111111101011","01111111111110111110","10111001101111111111","11110111111111111111",
@@ -219,16 +260,11 @@ void TestNumberOfIslands()
         proc(val);
     
     cout << "Islands:" <<sln.CountIslands(grid) << endl;
-    for (int i = 0; i < grid.size(); i++)
-    {
-        for (int j = 0; j < grid[0].size(); j++) cout << grid[i][j];
-        cout << endl;
-    }
 }
 
 int main(int argc,char *argv[])
 {
-    TestNumberOfIslands();
+    //TestNumberOfIslands();
     //TestRandomList();
     //TestEditDistance();
     //TestGrayCode();
