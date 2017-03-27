@@ -42,6 +42,62 @@ public:
     }
 };
 
+class CountPrimes
+{
+public:
+    int Count(int n)
+    {
+        //return CountOneByOne(n);
+        return SieveMethod(n);
+    }
+
+private:
+    bool IsPrime(int n)
+    {
+        if (n<2) return false;
+        if (n % 2 == 0) return n == 2;
+        if (n % 3 == 0) return n == 3;
+        if (n % 5 == 0) return n == 5;
+        for (int i = 7; i*i <= n; i += 2)
+        {
+            if (n%i == 0) return false;
+        }
+        return true;
+    }
+
+    int CountOneByOne(int n)
+    {
+        int count = 0;
+        for (int i = 0; i<n; i++)
+        {
+            if (IsPrime(i)) count++;
+        }
+        return count;
+    }
+
+    int SieveMethod(int n)
+    {
+        if (n<2) return 0;
+        vector<char> filter(n, 1);
+        filter[0] = 0;
+        filter[1] = 0;
+        for (int i = 2; i*i <= n; i++)
+        {
+            if (filter[i] == 1)
+            {
+                // from i*i
+                for (int j = i*i; j <= n; j += i) filter[j] = 0;
+            }
+        }
+        int count = 0;
+        for (auto val : filter)
+        {
+            if (val == 1) count++;
+        }
+        return count;
+    }
+};
+
 class PowSqrSolution 
 {
 public:

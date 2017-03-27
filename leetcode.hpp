@@ -337,7 +337,7 @@ public:
 };
 
 /*
-N Queens
+51 N Queens return solutions
 */
 class NQueens 
 {
@@ -399,6 +399,66 @@ private:
 };
 
 /*
+52 N Queens return solution count
+*/
+class NQueensII {
+public:
+    int Solve(int n)
+    {
+        if (0 == n) return 0;
+        BoardSize_ = n;
+        Result_ = 0;
+        Column_ = vector<int>(n, 0);
+        MainDiagonal_ = vector<int>(2 * n - 1, 0);
+        CounterDiagonal_ = vector<int>(2 * n - 1, 0);
+        DFS(0);
+        return Result_;
+    }
+
+private:
+    void DFS(int row)
+    {
+        if (row == BoardSize_)
+        {
+            Result_++;
+            return;
+        }
+        // goes row by row, full permute in each row
+        for (int col = 0; col<BoardSize_; col++)
+        {
+            if (CheckFlag(row, col))
+            {
+                SetFlag(row, col, 1);
+                DFS(row + 1);
+                // backtracking 
+                SetFlag(row, col, 0);
+            }
+        }
+    }
+
+    bool CheckFlag(int row, int col)
+    {
+        return (Column_[col] == 0 &&
+            MainDiagonal_[BoardSize_ - 1 - row + col] == 0 &&
+            CounterDiagonal_[row + col] == 0);
+    }
+
+    void SetFlag(int row, int col, int value)
+    {
+        Column_[col] = value;
+        MainDiagonal_[BoardSize_ - 1 - row + col] = value;
+        CounterDiagonal_[row + col] = value;
+    }
+
+    int BoardSize_;
+    int Result_;
+    // pruning by line '|' '\' '/'
+    vector<int> Column_;
+    vector<int> MainDiagonal_;
+    vector<int> CounterDiagonal_;
+};
+
+/*
 54. Spiral Matrix
 Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
 */
@@ -432,6 +492,30 @@ public:
         }
         return result;
     }
+};
+
+/*
+55 Jump Game
+Given an array of non-negative integers, you are initially positioned at the first index of the array.
+Each element in the array represents your maximum jump length at that position.
+Determine if you are able to reach the last index.
+*/
+class JumpGame {
+public:
+    bool CanJump(vector<int>& nums)
+    {
+        // greedy to check if it can reach 
+        int index = 0;
+        int max_reachable = 0;
+        for (; index<nums.size(); index++)
+        {
+            if (max_reachable < index) return false;
+            max_reachable = max(max_reachable, nums[index] + index);
+            if (max_reachable >= nums.size() - 1) return true;
+        }
+        return index == nums.size() - 1;
+    }
+
 };
 
 /*
@@ -533,6 +617,15 @@ public:
         return result;
     }
 };
+
+/*
+94, Binary Tree Inorder Traversal
+Inorder(Node*root)
+    if root == null return;
+    InOrder(root->left); 
+    visit(root); 
+    Inorder(root->right);
+*/
 
 /*
 121. Best Time to Buy and Sell Stock  QuestionEditorial Solution  My Submissions
