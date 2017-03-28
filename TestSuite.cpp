@@ -5,7 +5,7 @@ static void TestPermutation()
 {
     Permutation sln;
     vector<int> input{1,2,3,4};
-    vector<vector<int>> &&result = sln.permute(input);
+    vector<vector<int>> &&result = sln.Permute(input);
     for_each(result.begin(), result.end(), [](auto &val)
     {
         for_each(val.begin(), val.end(), [](auto num) {
@@ -31,7 +31,7 @@ static void TestCombineKoutofN()
 {
     CombinationSolution combine;
     vector<vector<int>> result;
-    result = combine.combine2(4, 2);
+    result = combine.CombineRecursion(4, 2);
     for_each(result.begin(), result.end(), [](auto &val) 
     {
         for (int dat : val)

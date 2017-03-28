@@ -255,7 +255,7 @@ Given a collection of distinct numbers, return all possible permutations.
 class Permutation
 {
 public:
-    vector<vector<int>> permute(vector<int>& nums)
+    vector<vector<int>> Permute(vector<int>& nums)
     {
         vector<vector<int>> result;
         if (nums.size() == 0) return result;
@@ -275,11 +275,61 @@ private:
         
         for (int i = start; i<nums.size(); i++)
         {
-            // P[i] = P[i] + P[i+1,N]
+            // P[i] = A[i] + P[i+1,N]
             swap(nums[start],nums[i]);
             FullPermute(result, nums, start + 1);
             swap(nums[start], nums[i]);
         }
+    }
+};
+
+/*
+47. Permutations II
+Given a collection of numbers that might contain duplicates, return all possible unique permutations.
+*/
+class PermutationII 
+{
+public:
+    vector<vector<int>> PermuteUnique(vector<int>& nums)
+    {
+        vector<vector<int>> result;
+        DFS(0, nums,result);
+        return result;
+    }
+
+private:
+    void DFS(int start, vector<int> &nums, vector<vector<int>> &result)
+    {
+        if (start == nums.size())
+        {
+            result.push_back(nums);
+            return;
+        }
+
+        for (int i = start; i<nums.size(); i++)
+        {
+            if (IsUnique(nums, start, i))
+            {
+                swap(nums[i], nums[start]);
+                DFS(start + 1, nums,result);
+                // fallback
+                swap(nums[i], nums[start]);
+            }
+        }
+    }
+
+    bool IsUnique(vector<int> &nums, int start, int i)
+    {
+        bool is_unique = true;
+        for (int j = start; j<i; j++)
+        {
+            if (nums[j] == nums[i])
+            {
+                is_unique = false;
+                break;
+            }
+        }
+        return is_unique;
     }
 };
 
@@ -525,16 +575,16 @@ Given two integers n and k, return all possible combinations of k numbers out of
 class CombinationSolution 
 {
 public:
-    vector<vector<int>> combine(int n, int k) 
+    vector<vector<int>> CombineRecursion(int n, int k) 
     {
         vector<vector<int>> result;
         vector<int> group;
         int start = 0;
-        dfs(n,k,1,0,group,result);
+        dfs(n,k,1,group,result);
         return result;
     }
 
-    vector<vector<int>> combine2(int n, int k) 
+    vector<vector<int>> CombineIteration(int n, int k) 
     {
         vector<vector<int>> result;
         int i = 0;
@@ -576,9 +626,9 @@ public:
 
 private:
     
-    void dfs(int n, int k,int start,int count,vector<int> &group,vector<vector<int>> &result)
+    void dfs(int n, int k,int start,vector<int> &group,vector<vector<int>> &result)
     {
-        if(count ==k)
+        if(0 ==k)
         {
             result.push_back(group);
         }
@@ -587,7 +637,7 @@ private:
             for(int i=start;i<=n;i++)
             {
                 group.push_back(i);
-                dfs(n,k,i+1,count+1,group,result);
+                dfs(n,k-1,i+1,group,result);
                 group.pop_back();
             }
         }
