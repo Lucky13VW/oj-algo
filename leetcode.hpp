@@ -645,6 +645,77 @@ private:
 };
 
 /*
+78. Subsets
+Given a set of distinct integers, nums, return all possible subsets.
+*/
+class Subsets 
+{
+public:
+    vector<vector<int>> CountRecursive(vector<int>& nums)
+    {
+        vector<vector<int>> result;
+        vector<int> one_sln;
+        DFS(result, one_sln, nums, 0);
+        return result;
+    }
+
+    vector<vector<int>> CountBitManipulation(vector<int>& nums)
+    {
+        //sort(nums.begin(), nums.end());
+        int num_subset = pow(2, nums.size());
+        vector<vector<int> > res(num_subset, vector<int>());
+        for (int i = 0; i < nums.size(); i++)
+            for (int j = 0; j < num_subset; j++)
+                if ((j >> i) & 1)
+                    res[j].push_back(nums[i]);
+        return res;
+    }
+    
+private:
+    void DFS(vector<vector<int>>&result, vector<int>&one_sln, vector<int>& nums, int start)
+    {
+        result.push_back(one_sln);
+        for (int i = start; i< nums.size(); i++)
+        {
+            one_sln.push_back(nums[i]);
+            DFS(result, one_sln, nums, i + 1);
+            one_sln.pop_back();
+        }
+    }
+};
+
+/*
+90. Subsets II
+Given a collection of integers that might contain duplicates, nums, return all possible subsets.
+*/
+class SubsetsII {
+public:
+    vector<vector<int>> subsetsWithDup(vector<int>& nums)
+    {
+        sort(nums.begin(), nums.end());
+        vector<vector<int>> result;
+        vector<int> one_sln;
+        DFS(result, one_sln, nums, 0);
+        return result;
+    }
+
+private:
+    void DFS(vector<vector<int>>&result, vector<int>&one_sln, vector<int>& nums, int start)
+    {
+        result.push_back(one_sln);
+        for (int i = start; i< nums.size(); i++)
+        {
+            if (i == start || nums[i] != nums[i - 1])
+            {
+                one_sln.push_back(nums[i]);
+                DFS(result, one_sln, nums, i + 1);
+                one_sln.pop_back();
+            }
+        }
+    }
+};
+
+/*
 89 Gray Code
 The gray code is a binary numeral system where two successive values differ in only one bit.
 Given a non-negative integer n representing the total number of bits in the code, 
