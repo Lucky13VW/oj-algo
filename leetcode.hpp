@@ -248,6 +248,47 @@ public:
     }
 };
 
+/*
+31. Next Permutation
+*/
+void NextPermutation(vector<int>& nums)
+{
+    if (nums.size() < 2) return;
+
+    int partition_index = nums.size() - 1;
+    int prev = nums[partition_index--];
+    // find the partition number (first non creasing index from right to left)
+    while (partition_index>0)
+    {
+        if (nums[partition_index] < prev) break;
+        else
+        {
+            prev = nums[partition_index];
+            partition_index--;
+        }
+    }
+    // find the change number (smallest index greater than partition number from right to left)
+    int change_index = nums.size() - 1;
+    while (change_index>partition_index)
+    {
+        if (nums[change_index] > nums[partition_index]) break;
+        else change_index--;
+    }
+    // reverse numuber after partition index
+    int left = partition_index, right = nums.size() - 1;
+    if (change_index != partition_index)
+    {
+        swap(nums[change_index], nums[partition_index]);
+        // change == partion suggests nums is the largest permutation,reverse whole
+        left++;
+    }
+
+    for (; left<right; left++, right--)
+    {
+        swap(nums[left], nums[right]);
+    }
+}
+
 /* 
 46. Permutations 
 Given a collection of distinct numbers, return all possible permutations.
