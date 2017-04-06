@@ -610,6 +610,34 @@ public:
 };
 
 /*
+75. Sort Colors
+Given an array with n objects colored red, white or blue, sort them so that objects of the same color are adjacent,
+with the colors in the order red, white and blue. Here, we will use the integers 0, 1, and 2 
+to represent the color red, white, and blue respectively.
+*/
+void SortColors(vector<int>& nums)
+{
+    int begin = 0;
+    int index = 0;
+    int end = nums.size() - 1;
+    while (index<=end)
+    {
+        switch (nums[index])
+        {
+        case 0: // red
+            swap(nums[index++], nums[begin++]);
+            break;
+        case 2: // blue
+            swap(nums[index], nums[end--]);
+            break;
+        default:
+            index++;
+            break;
+        }
+    }
+}
+
+/*
 77. Combinations
 Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
 */
