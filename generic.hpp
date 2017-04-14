@@ -12,6 +12,7 @@
 #include <queue>
 #include <algorithm>
 #include <functional>
+#include <math.h>
 
 using namespace std;
 
@@ -805,25 +806,25 @@ public:
 };
 
 template<typename id_type,typename data_type>
-struct TreeNode
+struct MyTreeNode
 {
 public:
     id_type id;
     data_type data;
-    TreeNode *left;
-    TreeNode *right;
-    TreeNode(id_type in_id, data_type in_data) :
+    MyTreeNode *left;
+    MyTreeNode *right;
+    MyTreeNode(id_type in_id, data_type in_data) :
         id(in_id),
         data(in_data),
         left(nullptr),
         right(nullptr) {}
-    ~TreeNode() = default;
+    ~MyTreeNode() = default;
 };
 
 template<typename id_type, typename data_type>
 class MyBinaryTree
 {
-    typedef TreeNode<id_type, data_type> BinaryTreeNode;
+    typedef MyTreeNode<id_type, data_type> BinaryTreeNode;
     typedef shared_ptr<BinaryTreeNode> SharedPtrTreeNode;
     typedef function< void(BinaryTreeNode*)> VisitFunc;
 public:
@@ -889,14 +890,13 @@ private:
 template<typename id_type, typename data_type>
 class LCA
 {
-    typedef TreeNode<id_type, data_type> BinaryTreeNode;
+    typedef MyTreeNode<id_type, data_type> BinaryTreeNode;
 
 public:
     // return lowest common ancestor
     BinaryTreeNode *BruteRecursive(BinaryTreeNode *current, BinaryTreeNode *node1, BinaryTreeNode *node2)
     {
-        if (current == nullptr) return nullptr;
-        if (current == node1 || current == node2) return current;
+        if (current == nullptr || current == node1 || current == node2) return current;
 
         BinaryTreeNode *left = BruteRecursive(current->left, node1, node2);
         BinaryTreeNode *right = BruteRecursive(current->right, node1, node2);
@@ -922,6 +922,262 @@ public:
             return BinarySearchTree(root->right,node1,node2);
         else 
             return root;
+    }
+};
+
+class ComparerMin
+{
+public:
+    static int Value(int a, int b) { return min(a, b); }
+};
+template<class Comparer= ComparerMin>
+class MyRMQst
+{
+public:
+    MyRMQst(vector<int> &nums)
+    {
+        SetData(nums);
+    }
+    MyRMQst() = default;
+    ~MyRMQst() = default;
+
+    // not correct
+    void SetData(vector<int> &nums)
+    {
+        // F[i, j] = min(F[i, j-1], F[i+2^(j-1), j-1])
+        int range = int(log(nums.size())/log(2))+1;
+        int num_size = nums.size()+1;
+        vector<int> temp(range, 0);
+        Data_.clear();
+        Data_.resize(num_size,temp);
+
+        for (int i = 1; i < num_size; i++) Data_[i][0] = nums[i-1];
+
+        for (int j = 1; j < range; j++)
+        {
+            for (int i = 1; i < num_size; i++)
+            {
+                int k = i + (1 << j) - 1;
+                if (k < num_size)
+                    Data_[i][j]= Comparer::Value(Data_[i][j - 1], Data_[i + (1 << (j - 1))][j - 1]);
+            }
+        }
+    }
+
+    int MostValue(int i, int j)
+    {
+        i++; j++;
+        if (i > j) swap(i, j);
+
+        // k=log2(j-i+1) 
+        int k = int(log(j - i + 1) / log(2));
+        // RMQ(i,j) = min(F[i,k], F[j-2^k+1,k])
+        return Comparer::Value(Data_[i][k], Data_[j + 1 - (1 << k)][k]);
+    }
+
+private:
+    vector<vector<int>> Data_;
+};
+
+class MySuffixArray
+{
+
+public:
+    MySuffixArray(const string &str)
+    {
+        SetString(str);
+    }
+    MySuffixArray() = default;
+    ~MySuffixArray() = default;
+    
+    void SetString(const string &str)
+    {
+        RawString_ = str;
+        SA_.clear();
+        for (int i = 0; i < str.size(); i++)
+        {
+            SA_.push_back(i);
+        }
+        sort(SA_.begin(), SA_.end(), [&](int offset1, int offset2) 
+        { return RawString_.substr(offset1) < RawString_.substr(offset2); });
+
+        // calculate rank, the raw index in SA
+        Rank_.resize(SA_.size(),0);
+        for (int i = 0; i < SA_.size(); i++)
+        {
+            Rank_[SA_[i]] = i;
+        }
+        // calculate height array height[i] = LCP(i,i-1)
+        Height_.resize(SA_.size(), 0);
+        for (int i = 1; i < SA_.size(); i++)
+        {
+            Height_[i] = TwoStringLCP(SuffixStr(i) , SuffixStr(i-1));
+        }
+        RMQmin_.SetData(Height_);
+    }
+
+    int Rank(const string &pat)
+    {
+        int lo = 0;
+        int hi = SA_.size() - 1;
+        while (lo <= hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            const string &suffix = SuffixStr(mid);
+            if (pat < suffix)  hi = mid - 1;
+            else if (pat > suffix) lo = mid + 1;
+            else return mid;
+        }
+        
+        return lo;
+    }
+
+    int Substring(const string &pat)
+    {
+        int lo = 0;
+        int hi = SA_.size() - 1;
+        while (lo <= hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            const string &suffix = SuffixStr(mid);
+            // search for prefix matched string in suffix
+            int res = suffix.compare(0,pat.size(),pat);
+            if (res>0)  hi = mid - 1;
+            else if (res<0) lo = mid + 1;
+            else return SA_[mid];
+        }
+        
+        return -1;
+    }
+
+    // Longest Common Substring
+    string LCS(int split)
+    {
+        int max = 0;
+        int index = 0;
+        for (int i = 1; i < Height_.size(); i++)
+        {
+            if (Height_[i] > max &&
+                (SA_[i - 1] - split)*(SA_[i] - split) < 0)
+            {
+                max = Height_[i];
+                index = i;
+
+            }
+        }
+        return SuffixStr(index).substr(0, Height_[index]);
+    }
+
+    // Longest Palindromic Substring
+    /*
+    S="aabaaaab",  SS'="aabaaab$baaabaa",str(ss)=len , search from 1 to len(s)
+    find the LCP(i and len-i) consider odd and even
+    */
+    string LPS(int split)
+    {
+        int max = 0;
+        int index = 0;
+        for (int i = 1; i < RawString_.size()/2; i++)
+        {
+            // odd i is the center of palindromic string LCP(i,len-i-1) 
+            // xx|i.......|(len-i-1)xxx
+            int lcp = LCP(i, RawString_.size() - i -1);
+            if(lcp*2-1 > max)
+            {
+                max = lcp*2-1;
+                index = i-lcp+1;
+            }
+            // even xx|i.......|(len-i)xx
+            lcp = LCP(i, RawString_.size() - i );
+            if (lcp*2 > max)
+            {
+                max = lcp*2;
+                index = i-lcp;
+             }
+        }
+        return RawString_.substr(index, max);
+    }
+
+private:
+    string SuffixStr(int sa_index)
+    {
+        return RawString_.substr(SA_[sa_index]);
+    }
+
+    // lcp(RawString[index1],RawString[index2])
+    int LCP(int index1, int index2)
+    {
+        int first = Rank_[index1];
+        int second = Rank_[index2];
+        if (first > second) swap(first,second);
+
+        int min = INT_MAX;
+        for (int i = first+1; i <= second; i++) 
+        {
+            if (min > Height_[i]) min = Height_[i];
+        }
+        return min;
+    }
+
+    int LCPRMQ(int index1, int index2)
+    {
+        return RMQmin_.MostValue(Rank_[index1], Rank_[index2]);
+    }
+
+    int TwoStringLCP(const string &str1,const string &str2)
+    {
+        int len = min(str1.size(),str2.size());
+        for (int i = 0; i < len; i++)
+        {
+            if (str1[i] != str2[i]) return i;
+        }
+        return  len;
+    }
+
+   
+private:
+    vector<int> SA_;
+    vector<int> Rank_;
+    vector<int> Height_;
+    string RawString_;
+    MyRMQst<> RMQmin_;
+};
+
+// string LSD(least significant digit) sort
+class LSDSort
+{
+public:
+    void Sort(vector<string> &StrArr)
+    {
+        if (StrArr.size() == 0) return;
+
+        int Radix = 256;
+        
+        int str_len = StrArr[0].size();
+        int arr_len = StrArr.size();
+        // from right to left LSD
+        for (int d = str_len - 1; d >= 0; d--)
+        {
+            vector<int> count(Radix+1, 0);
+            // compute frequency of each character, count[r+1!!!]  
+            for (int i = 0; i < arr_len; i++) 
+                count[StrArr[i].at(d) + 1]++;
+
+            // change counts to indices
+            for (int i = 0; i < Radix; i++) 
+                count[i + 1] += count[i];
+
+            // distribute it to temp array
+            // r = count[StrArr[i].at(d)]++ 
+            // '++' here is to handle same character, move r to next position in aux
+            vector<string> aux(arr_len,"");
+            for (int i = 0; i < arr_len; i++) 
+                aux[count[StrArr[i].at(d)]++] = StrArr[i]; 
+
+            // save back to string array
+            for (int i = 0; i < arr_len; i++)
+                StrArr[i] = aux[i];
+        }
     }
 };
 

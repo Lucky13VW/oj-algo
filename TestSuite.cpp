@@ -1,5 +1,7 @@
 #include "generic.hpp"
 #include "leetcode.hpp"
+#include "leetcode_tree.hpp"
+#include "leetcode_pc.hpp"
 
 static void TestPermutation()
 {
@@ -29,7 +31,7 @@ static void TestBitmapSort()
 
 static void TestCombineKoutofN()
 {
-    CombinationSolution combine;
+    Combinations combine;
     vector<vector<int>> result;
     result = combine.CombineRecursion(4, 2);
     for_each(result.begin(), result.end(), [](auto &val) 
@@ -262,8 +264,76 @@ static void TestNumberOfIslands()
     cout << "Islands:" <<sln.CountIslands(grid) << endl;
 }
 
+static void TestThreeSum()
+{
+    vector<int> nums{ 1,2,-2,-1};
+    ThreeSum sln;
+    vector<vector<int>> result = sln.Solution(nums);
+
+    for (auto vec : result)
+    {
+        for (auto num : vec) cout << num << " ";
+        cout << endl;
+    }
+}
+
+static void TestSeriDeseriBinaryTree()
+{
+    TreeNode *a_node = new TreeNode(1);
+    a_node->right = new TreeNode(2);
+    BinaryTreeCodec sln;
+    string data = sln.serialize(a_node);
+    TreeNode *root = sln.deserialize(data);
+}
+
+static void TestSuffixArray()
+{
+    string str = "madam";
+    string pat = "am";
+    MySuffixArray sa(str);
+    cout << str <<".substr("<< pat << ")=" << sa.Substring(pat) << endl;;
+
+    str = "abdefcabdefcbutst";
+    pat = "xbutsa";
+
+    stringstream ss;
+    ss << str << "$" << pat;
+    sa.SetString(ss.str());
+    cout << "LCS(" << str << "," << pat << "):" << sa.LCS(str.size()) << endl;
+    
+    str = "abcd1ghg2dcba";
+    ss.str(""); // right way to clear stringstream
+    ss << str << "$";
+    string rev_str = str;
+    reverse(rev_str.begin(), rev_str.end());
+    ss << rev_str;
+    sa.SetString(ss.str());
+    cout << "LPS(" << str <<"):" << sa.LPS(str.size()) << endl;
+}
+
+static void TestRMQ()
+{
+    vector<int> nums{ 3,5,2,6,1 };
+    MyRMQst<> rmq(nums);
+    
+    cout<< rmq.MostValue(0, 3) <<endl;
+}
+
+static void TestLSDSort()
+{
+    vector<string> str_arr{"CDE3","CA21","BA3R","A142","1Abc"};
+    LSDSort sln;
+    sln.Sort(str_arr);
+    for (auto &str : str_arr) cout << str << endl;
+}
+
 int main(int argc,char *argv[])
 {
+    TestLSDSort();
+    //TestRMQ();
+    //TestSuffixArray();
+    //TestSeriDeseriBinaryTree();
+    //TestThreeSum();
     //TestNumberOfIslands();
     //TestRandomList();
     //TestEditDistance();

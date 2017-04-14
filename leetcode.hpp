@@ -2,11 +2,13 @@
 #define LEETCODE_HPP
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <climits>
 #include <stack>
+#include <queue>
 #include <algorithm>
 #include <string>
 
@@ -19,25 +21,45 @@ Given nums = [2, 7, 11, 15], target = 9,
 Because nums[0] + nums[1] = 2 + 7 = 9,
 return [0, 1].
 */
-class TwoSumSolution {
+class TwoSumSolution 
+{
 public:
     vector<int> twoSum(vector<int>& nums, int target) 
     {
-        unordered_map<int,int> value_map;
-        
-        for(int i=1;i<nums.size();i++)
-        {
-            value_map[nums[i]]=i;
-        }
         vector<int> result;
-        for(int i=0;i<nums.size();i++)
+        unordered_map<int, int> sum_map;
+        for (int i = 0; i<nums.size(); i++)
         {
-            auto iter = value_map.find(target-nums[i]);
-            if(iter != value_map.end())
+            sum_map[nums[i]] = i;
+        }
+
+        for (int i = 0; i<nums.size(); i++)
+        {
+            auto found = sum_map.find(target - nums[i]);
+            if (found != sum_map.end() && found->second != i)
             {
-                result.push_back(i+1);
-                result.push_back(iter->second+1);
+                result.push_back(i);
+                result.push_back(found->second);
                 break;
+            }
+        }
+        return result;
+    }
+
+    vector<int> twoSum2(vector<int>& nums, int target)
+    {
+        vector<int> result;
+        for (int i = 0; i<nums.size(); i++)
+        {
+            int expected = target - nums[i];
+            for (int j = i + 1; j<nums.size(); j++)
+            {
+                if (expected == nums[j])
+                {
+                    result.push_back(i);
+                    result.push_back(j);
+                    return result;
+                }
             }
         }
         return result;
@@ -179,6 +201,39 @@ public:
 
 };
 
+/*
+7. Reverse Integer 
+x = 123, return 321, x = -123, return -321
+*/
+class ReverseInteger
+{
+public:
+    int Solution(int x) {
+        int flag = 1;
+        if (x<0)
+        {
+            flag = -1;
+            x = x*flag;
+        }
+        int res = 0;
+        while (x>0)
+        {
+            if ((INT_MAX - x % 10) / 10 >= res)
+            {
+                res = res * 10 + x % 10;
+                x = x / 10;
+            }
+            else
+            {
+                res = 0;
+                break;
+            }
+        }
+        res = res*flag;
+        return res;
+    }
+};
+
 // 8. String to Integer (atoi)
 class MyAtoiSolution {
 public:
@@ -202,6 +257,84 @@ public:
         }
         
         return total*sign;
+    }
+};
+
+/*
+15. 3Sum
+Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? 
+Find all unique triplets in the array which gives the sum of zero.
+*/
+class ThreeSum 
+{
+public:
+    vector<vector<int>> Solution(vector<int>& nums)
+    {
+        vector<vector<int>> result;
+        if (nums.size() < 3) return result;
+
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i<nums.size(); i++)
+        {
+            TwoSum(nums[i], i + 1, nums);
+        }
+
+        result = vector<vector<int>>(answer_.begin(), answer_.end());
+        return result;
+    }
+
+private:
+    void TwoSum(int curr_num, int start, vector<int> &nums)
+    {
+        int begin = start;
+        int end = nums.size() - 1;
+        while (begin<end)
+        {
+            int sum = nums[begin] + nums[end];
+            if (sum == -curr_num)
+            {
+                answer_.insert({ curr_num,nums[begin],nums[end] });
+                begin++; end--;
+            }
+            else if (sum < -curr_num) begin++;
+            else end--;
+        }
+    }
+    // filter out duplication
+    set<vector<int>> answer_;
+};
+
+/*
+16. 3Sum Closest
+For example, given array S = {-1 2 1 -4}, and target = 1.
+The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+*/
+class ThreeSumClosest 
+{
+public:
+    int Solution(vector<int>& nums, int target)
+    {
+        int closest_gap = INT_MAX;
+        if (nums.size()<3) return closest_gap;
+
+        sort(nums.begin(), nums.end());
+
+        for (int i = 0; i<nums.size(); i++)
+        {
+            int begin = i + 1;
+            int end = nums.size() - 1;
+            while (begin<end)
+            {
+                int sum = nums[i] + nums[begin] + nums[end];
+                int gap = target - sum;
+                if (closest_gap == INT_MAX || abs(gap)<abs(closest_gap)) closest_gap = gap;
+
+                if (gap == 0) return target;
+                else if (gap>0) begin++;
+                else end--;
+            }
+        }
+        return target - closest_gap;
     }
 };
 
@@ -248,131 +381,6 @@ public:
     }
 };
 
-/*
-31. Next Permutation
-*/
-void NextPermutation(vector<int>& nums)
-{
-    if (nums.size() < 2) return;
-
-    int partition_index = nums.size() - 1;
-    int prev = nums[partition_index--];
-    // find the partition number (first non creasing index from right to left)
-    while (partition_index>0)
-    {
-        if (nums[partition_index] < prev) break;
-        else
-        {
-            prev = nums[partition_index];
-            partition_index--;
-        }
-    }
-    // find the change number (smallest index greater than partition number from right to left)
-    int change_index = nums.size() - 1;
-    while (change_index>partition_index)
-    {
-        if (nums[change_index] > nums[partition_index]) break;
-        else change_index--;
-    }
-    // reverse numuber after partition index
-    int left = partition_index, right = nums.size() - 1;
-    if (change_index != partition_index)
-    {
-        swap(nums[change_index], nums[partition_index]);
-        // change == partion suggests nums is the largest permutation,reverse whole
-        left++;
-    }
-
-    for (; left<right; left++, right--)
-    {
-        swap(nums[left], nums[right]);
-    }
-}
-
-/* 
-46. Permutations 
-Given a collection of distinct numbers, return all possible permutations.
-*/
-class Permutation
-{
-public:
-    vector<vector<int>> Permute(vector<int>& nums)
-    {
-        vector<vector<int>> result;
-        if (nums.size() == 0) return result;
-
-        FullPermute(result, nums,0);
-        return result;
-    }
-
-private:
-    void FullPermute(vector<vector<int>> &result, vector<int>& nums, int start)
-    {
-        if (start == nums.size())
-        {
-            result.push_back(nums);
-            return;
-        }
-        
-        for (int i = start; i<nums.size(); i++)
-        {
-            // P[i] = A[i] + P[i+1,N]
-            swap(nums[start],nums[i]);
-            FullPermute(result, nums, start + 1);
-            swap(nums[start], nums[i]);
-        }
-    }
-};
-
-/*
-47. Permutations II
-Given a collection of numbers that might contain duplicates, return all possible unique permutations.
-*/
-class PermutationII 
-{
-public:
-    vector<vector<int>> PermuteUnique(vector<int>& nums)
-    {
-        vector<vector<int>> result;
-        DFS(0, nums,result);
-        return result;
-    }
-
-private:
-    void DFS(int start, vector<int> &nums, vector<vector<int>> &result)
-    {
-        if (start == nums.size())
-        {
-            result.push_back(nums);
-            return;
-        }
-
-        for (int i = start; i<nums.size(); i++)
-        {
-            if (IsUnique(nums, start, i))
-            {
-                swap(nums[i], nums[start]);
-                DFS(start + 1, nums,result);
-                // fallback
-                swap(nums[i], nums[start]);
-            }
-        }
-    }
-
-    bool IsUnique(vector<int> &nums, int start, int i)
-    {
-        bool is_unique = true;
-        for (int j = start; j<i; j++)
-        {
-            if (nums[j] == nums[i])
-            {
-                is_unique = false;
-                break;
-            }
-        }
-        return is_unique;
-    }
-};
 
 /*
 48. Rotate Image
@@ -492,7 +500,8 @@ private:
 /*
 52 N Queens return solution count
 */
-class NQueensII {
+class NQueensII 
+{
 public:
     int Solve(int n)
     {
@@ -615,170 +624,26 @@ Given an array with n objects colored red, white or blue, sort them so that obje
 with the colors in the order red, white and blue. Here, we will use the integers 0, 1, and 2 
 to represent the color red, white, and blue respectively.
 */
-void SortColors(vector<int>& nums)
+class SortColors
 {
-    int begin = 0;
-    int index = 0;
-    int end = nums.size() - 1;
-    while (index<=end)
+    void Sort(vector<int>& nums)
     {
-        switch (nums[index])
+        int begin = 0;
+        int index = 0;
+        int end = nums.size() - 1;
+        while (index <= end)
         {
-        case 0: // red
-            swap(nums[index++], nums[begin++]);
-            break;
-        case 2: // blue
-            swap(nums[index], nums[end--]);
-            break;
-        default:
-            index++;
-            break;
-        }
-    }
-}
-
-/*
-77. Combinations
-Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
-*/
-class CombinationSolution 
-{
-public:
-    vector<vector<int>> CombineRecursion(int n, int k) 
-    {
-        vector<vector<int>> result;
-        vector<int> group;
-        int start = 0;
-        dfs(n,k,1,group,result);
-        return result;
-    }
-
-    vector<vector<int>> CombineIteration(int n, int k) 
-    {
-        vector<vector<int>> result;
-        int i = 0;
-        vector<int> group(k, 0);
-        while (i >= 0) 
-        {
-            group[i]++; // Increment element at index i
-
-            if (group[i] > n) // Move index to the left if the element exceeded n.
+            switch (nums[index])
             {
-                --i;
-            }
-            /* If the index is at the end of the vector
-            * c, then (because the other conditions are
-            * obeyed), we know we have a valid combination,
-            * so push it to our ans vector<vector<>>
-            */
-            else if (i == k - 1)
-            {
-                result.push_back(group);
-            }
-            /* Move index to the right and set the
-            * element at that index equal to the
-            * element at the previous index.
-            *
-            * Because of the increment at the beginning
-            * of this while loop, we ensure that the
-            * element at this index will be at least
-            * one more than its neighbor to the left.
-            */
-            else 
-            {
-                ++i;
-                group[i] = group[i - 1];
-            }
-        }
-        return result;
-    }
-
-private:
-    
-    void dfs(int n, int k,int start,vector<int> &group,vector<vector<int>> &result)
-    {
-        if(0 ==k)
-        {
-            result.push_back(group);
-        }
-        else
-        {
-            for(int i=start;i<=n;i++)
-            {
-                group.push_back(i);
-                dfs(n,k-1,i+1,group,result);
-                group.pop_back();
-            }
-        }
-    }
-};
-
-/*
-78. Subsets
-Given a set of distinct integers, nums, return all possible subsets.
-*/
-class Subsets 
-{
-public:
-    vector<vector<int>> CountRecursive(vector<int>& nums)
-    {
-        vector<vector<int>> result;
-        vector<int> one_sln;
-        DFS(result, one_sln, nums, 0);
-        return result;
-    }
-
-    vector<vector<int>> CountBitManipulation(vector<int>& nums)
-    {
-        //sort(nums.begin(), nums.end());
-        int num_subset = pow(2, nums.size());
-        vector<vector<int> > res(num_subset, vector<int>());
-        for (int i = 0; i < nums.size(); i++)
-            for (int j = 0; j < num_subset; j++)
-                if ((j >> i) & 1)
-                    res[j].push_back(nums[i]);
-        return res;
-    }
-    
-private:
-    void DFS(vector<vector<int>>&result, vector<int>&one_sln, vector<int>& nums, int start)
-    {
-        result.push_back(one_sln);
-        for (int i = start; i< nums.size(); i++)
-        {
-            one_sln.push_back(nums[i]);
-            DFS(result, one_sln, nums, i + 1);
-            one_sln.pop_back();
-        }
-    }
-};
-
-/*
-90. Subsets II
-Given a collection of integers that might contain duplicates, nums, return all possible subsets.
-*/
-class SubsetsII {
-public:
-    vector<vector<int>> subsetsWithDup(vector<int>& nums)
-    {
-        sort(nums.begin(), nums.end());
-        vector<vector<int>> result;
-        vector<int> one_sln;
-        DFS(result, one_sln, nums, 0);
-        return result;
-    }
-
-private:
-    void DFS(vector<vector<int>>&result, vector<int>&one_sln, vector<int>& nums, int start)
-    {
-        result.push_back(one_sln);
-        for (int i = start; i< nums.size(); i++)
-        {
-            if (i == start || nums[i] != nums[i - 1])
-            {
-                one_sln.push_back(nums[i]);
-                DFS(result, one_sln, nums, i + 1);
-                one_sln.pop_back();
+            case 0: // red
+                swap(nums[index++], nums[begin++]);
+                break;
+            case 2: // blue
+                swap(nums[index], nums[end--]);
+                break;
+            default:
+                index++;
+                break;
             }
         }
     }
@@ -807,15 +672,6 @@ public:
         return result;
     }
 };
-
-/*
-94, Binary Tree Inorder Traversal
-Inorder(Node*root)
-    if root == null return;
-    InOrder(root->left); 
-    visit(root); 
-    Inorder(root->right);
-*/
 
 /*
 121. Best Time to Buy and Sell Stock  QuestionEditorial Solution  My Submissions
@@ -903,7 +759,8 @@ All words have the same length.
 All words contain only lowercase alphabetic characters.
 */
 
-class WordLadderSolution {
+class WordLadderSolution 
+{
 public:
     int ladderLength(string beginWord, string endWord, vector<string>&wordList) 
     {
@@ -1029,7 +886,8 @@ public:
   419. Battleships in a Board
  */
 
-class BattleshipsInBoard {
+class BattleshipsInBoard 
+{
 public:
     int CountBS(vector<vector<char>>& board)
     {
@@ -1113,18 +971,20 @@ public:
 /*
 171. Excel Sheet Column Number
 */
-int titleToNumber(string s)
+class ExcelSheetColumnNumber
 {
-    int number = 0;
-    for (auto val : s)
+    int titleToNumber(string s)
     {
-        char c_digit = toupper(val);
-        int n_digit = c_digit - 'A' + 1;
-        number = number * 26 + n_digit;
+        int number = 0;
+        for (auto val : s)
+        {
+            char c_digit = toupper(val);
+            int n_digit = c_digit - 'A' + 1;
+            number = number * 26 + n_digit;
+        }
+        return number;
     }
-    return number;
-}
-
+};
 /*
 200. Number of Islands
 */
@@ -1187,4 +1047,5 @@ public:
         }
     }
 };
+
 #endif
