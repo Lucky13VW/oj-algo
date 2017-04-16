@@ -261,6 +261,29 @@ public:
 };
 
 /*
+9. Palindrome Number
+Determine whether an integer is a palindrome. Do this without extra space.
+*/
+class PalindromeNumber
+{
+public:
+    bool Check(int x)
+    {
+        if (x<0 || (x != 0 && x % 10 == 0)) return false;
+
+        int sum = 0;
+
+        while (x>sum)
+        {
+            sum = sum * 10 + x % 10;
+            x = x / 10;
+        }
+        // even or odd
+        return (x == sum || x == sum / 10);
+    }
+};
+
+/*
 15. 3Sum
 Given an array S of n integers, are there elements a, b, c in S such that a + b + c = 0? 
 Find all unique triplets in the array which gives the sum of zero.
@@ -335,6 +358,95 @@ public:
             }
         }
         return target - closest_gap;
+    }
+};
+
+/*
+20. Valid Parentheses
+Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+The brackets must close in the correct order, "()" and "()[]{}" are all valid but "(]" and "([)]" are not.
+*/
+class ValidParentheses
+{
+public:
+    bool Check(string s)
+    {
+        unordered_map<char, char> par_pair;
+        par_pair['('] = ')';
+        par_pair['{'] = '}';
+        par_pair['['] = ']';
+        stack<char> par;
+        for (char c : s)
+        {
+            if (par_pair.find(c) != par_pair.end()) par.push(par_pair[c]);
+            else if (!par.empty() && par.top() == c) par.pop();
+            else return false;
+        }
+        return par.empty();
+    }
+};
+
+/*
+28. Implement strStr()
+Returns the index of the first occurrence of needle in haystack or -1(not found).
+*/
+class MyStrStr 
+{
+public:
+    int strstr(const string &haystack, const string &needle)
+    {
+        if (needle.size() == 0) return 0;
+
+        int last = haystack.size() - needle.size() + 1;
+        for (int i = 0; i<last; i++)
+        {
+            int j = 0;
+            int temp = i;
+            for (; j<needle.size(); j++)
+            {
+                if (haystack[temp++] != needle[j]) break;
+            }
+            if (j == needle.size()) return i;
+        }
+        return -1;
+    }
+
+    int sunday(const string &haystack, const string &needle)
+    {
+        // sunday version
+        if (needle.size() == 0) return 0;
+
+        // preproccess pattern
+        vector<int> char_set(256, -1);
+        for (int i = 0; i<needle.size(); i++)
+        {
+            char_set[needle[i] - 'a'] = i;
+        }
+
+        int last_check = haystack.size() - needle.size();
+        for (int i = 0; i <= last_check;)
+        {
+            int j = 0;
+            int temp = i;
+            for (; j<needle.size(); j++)
+            {
+                if (haystack[temp++] != needle[j])
+                {
+                    // mismatch
+                    int index = i + needle.size();
+                    if (index<haystack.size())
+                    {
+                        int val = char_set[haystack[index] - 'a'];
+                        if (val == -1) i = index+1;
+                        else i = index - val;
+                        break;
+                    }
+                    else return -1;
+                }
+            }
+            if (j == needle.size()) return i;
+        }
+        return -1;
     }
 };
 
@@ -674,56 +786,60 @@ public:
 };
 
 /*
-121. Best Time to Buy and Sell Stock  QuestionEditorial Solution  My Submissions
-Total Accepted: 112522
-Total Submissions: 307050
-Difficulty: Easy
-Say you have an array for which the ith element is the price of a given stock on day i.
-
-If you were only permitted to complete at most one transaction (ie, buy one and sell one share of the stock), design an algorithm to find the maximum profit.
-
+121. Best Time to Buy and Sell Stock  
+If you were only permitted to complete at most one transaction 
+(ie, buy one and sell one share of the stock)
 Example 1:
 Input: [7, 1, 5, 3, 6, 4]
 Output: 5
 max. difference = 6-1 = 5 (not 7-1 = 6£©
-
-Example 2:
-Input: [7, 6, 4, 3, 1]
-Output: 0
-
-In this case, no transaction is done, i.e. max profit = 0.
 */
-
-class BestTimeStockSolution
+class BestTimeBuySellStock
 {
 public:
-    vector<int> MaxProfit(vector<int> &prices)
+    int MaxProfit(vector<int>& prices) 
     {
-        vector<int> best;
-        if (prices.size() == 0)
-            return best;  
-          
-        int try_buy_price = prices[0]; 
-        int best_buy_time=0,try_buy_time=0,best_sell_time=0,max_profit = 0;
-        for (int i = 1; i < prices.size(); i++)
-        {  
-            //prices[i] - min > profit ? prices[i] - min : profit;
-            int profit = prices[i] - try_buy_price;
-            if(profit > max_profit)
-            {
-                max_profit = profit;
-                best_sell_time = i;
-                best_buy_time = try_buy_time;
-            }
-            if( prices[i] < try_buy_price)
-            {
-                try_buy_price = prices[i];
-                try_buy_time = i;
-            }
-            //prices[i] < min ? prices[i] : min;  
+        int max = 0;
+        int buy = INT_MAX;
+        for (int i = 0; i<prices.size(); i++)
+        {
+            int profit = prices[i] - buy;
+            if (profit > max) max = profit;
+            if (prices[i] < buy) buy = prices[i];
         }
-        best.push_back(best_buy_time);best.push_back(best_sell_time);best.push_back(max_profit);
-        return best;  
+        return max;
+    }
+};
+
+/*
+122. Best Time to Buy and Sell Stock II
+You may complete as many transactions as you like (ie, buy one and sell of the stock multiple times). 
+However, you may not engage in multiple transactions at the same time 
+(ie, you must sell the stock before you buy again).
+*/
+class BestTimeBuySellStockII {
+public:
+    int maxProfit(vector<int>& prices)
+    {
+        int sum = 0;
+        int buy = INT_MAX;
+        int sell = INT_MIN;
+        int previous = INT_MAX;
+        for (int i = 0; i<prices.size(); i++)
+        {
+            if (prices[i] < previous)
+            {
+                // commit preivous buy/sell
+                if (previous > buy)
+                {
+                    sum += (previous - buy);
+                }
+                buy = prices[i];
+            }
+            previous = prices[i];
+        }
+        if (previous>buy) sum += (previous - buy);
+        return sum;
     }
 };
 
@@ -736,6 +852,43 @@ public:
     }
 };
 
+/*
+125. Valid Palindrome
+Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
+
+For example,
+"A man, a plan, a canal: Panama" is a palindrome.
+"race a car" is not a palindrome.
+*/
+class ValidPalindrome {
+public:
+    bool Check(string s)
+    {
+        if (s.size() == 0) return true;
+
+        int begin = 0;
+        int end = s.size() - 1;
+        while (begin<end)
+        {
+            if (!isalnum(s[begin]))
+            {
+                begin++;
+                continue;
+            }
+
+            if (!isalnum(s[end]))
+            {
+                end--;
+                continue;
+            }
+            if (tolower(s[begin]) != tolower(s[end])) return false;
+
+            begin++;
+            end--;
+        }
+        return true;
+    }
+};
 
 /*
 127. Word Ladder

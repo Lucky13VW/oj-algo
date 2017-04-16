@@ -42,18 +42,6 @@ static void TestCombineKoutofN()
     });
 }
 
-static void TestBestTimeStockSolution()
-{
-    int data[15] = { 9989,9992,9998,9997,9991,9925,9994,9993,9992,9999,9990,9989,9988,9987,9986 };
-    vector<int> prices;
-    for (int i = 0; i<15; i++)
-        prices.push_back(data[i]);
-
-    BestTimeStockSolution best1;
-    vector<int> besttime = best1.MaxProfit(prices);
-    cout << besttime[0] << "," << besttime[1] << "," << besttime[2] << endl;
-}
-
 static void TestDP_LIS()
 {
     int arr[] = { 3,8,4,8,4,6 };
@@ -329,7 +317,9 @@ static void TestLSDSort()
 
 int main(int argc,char *argv[])
 {
-    TestLSDSort();
+    PalindromeNumber pn;
+    pn.Check(10);
+    //TestLSDSort();
     //TestRMQ();
     //TestSuffixArray();
     //TestSeriDeseriBinaryTree();

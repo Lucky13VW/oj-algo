@@ -378,4 +378,45 @@ private:
     vector<int> OneGroup_;
 };
 
+
+/*
+216. Combination Sum III
+Find all possible combinations of k numbers that add up to a number n,
+given that only numbers from 1 to 9 can be used and each combination should be a unique set of numbers.
+
+Example 2:
+Input: k = 3, n = 9
+Output:
+[[1,2,6], [1,3,5], [2,3,4]]
+*/
+class CombinationSum3
+{
+public:
+    vector<vector<int>> Solution(int k, int n) 
+    {
+        Helper(1,k,n);
+        return Result_;
+    }
+    
+private:
+    void Helper(int start, int remaining, int target)
+    {
+        if(target == 0 && remaining==0) 
+        {
+            Result_.push_back(Group_);
+            return;
+        }
+        
+        for(int i=start;i<=9 && i<=target; i++)
+        {
+            Group_.push_back(i);
+            Helper(i+1,remaining-1,target-i);
+            Group_.pop_back();
+        }
+    }
+    
+    vector<vector<int>> Result_;
+    vector<int> Group_;
+};
+
 #endif
