@@ -299,40 +299,84 @@ static void TestSuffixArray()
     cout << "LPS(" << str <<"):" << sa.LPS(str.size()) << endl;
 }
 
+static void TestLPS()
+{
+    stringstream ss;
+    string str = "abcd1ghg2dcba";
+    
+    ss << str << "$";
+    string rev_str = str;
+    reverse(rev_str.begin(), rev_str.end());
+    ss << rev_str;
+
+    MySuffixArray sa;
+    sa.SetString(ss.str());
+    cout << "LPS(" << str << "):" << sa.LPS(str.size()) << endl;
+}
+
 static void TestRMQ()
 {
-    vector<int> nums{ 3,5,2,6,1 };
+    vector<int> nums{ 3,5,5,0,9,6,2,1};
     MyRMQst<> rmq(nums);
-    
-    cout<< rmq.MostValue(0, 3) <<endl;
+    for (auto num : nums) cout << num << " ";
+    cout << endl;
+    cout<< rmq.MostValue(0, 5) <<endl;
 }
 
 static void TestLSDSort()
 {
     vector<string> str_arr{"CDE3","CA21","BA3R","A142","1Abc"};
-    LSDSort sln;
+    for (auto &str : str_arr) cout << str << endl;
+    StringLSDSort sln;
     sln.Sort(str_arr);
+    cout << "**** Sort ****" << endl;
     for (auto &str : str_arr) cout << str << endl;
 }
 
+static void TestGenericSort()
+{
+    vector<int> arr;
+
+    srand(time(NULL));
+    int N = 18;
+    for (int i = 0; i < N; i++)
+    {
+        int r = rand() % N;
+        if(r>0) arr.push_back(r);
+    }
+
+    function<void()> PrintFunc = [&]() 
+    {for (auto num : arr) cout << num << " "; 
+     cout << endl; };
+    PrintFunc();
+
+    MergeSortInplace<int> sln;
+    sln.Sort(arr);
+
+    cout << "**** Sort ****" << endl;
+    PrintFunc();
+}
+
+static void TestBinaryHeap()
+{
+    BasicBinaryHeap<int,MaxHeapOpt<int>> bh(4);
+    bh.Insert(4); 
+    bh.Insert(6); 
+    bh.Insert(7);
+    bh.Insert(5);
+    cout << bh.Top() << endl;
+    bh.Pop();
+    cout << bh.Top() << endl;
+    bh.Insert(8);
+    bh.Insert(9);
+    cout << bh.Top() << endl;
+}
+
+
 int main(int argc,char *argv[])
 {
-    PalindromeNumber pn;
-    pn.Check(10);
-    //TestLSDSort();
-    //TestRMQ();
-    //TestSuffixArray();
-    //TestSeriDeseriBinaryTree();
-    //TestThreeSum();
-    //TestNumberOfIslands();
-    //TestRandomList();
-    //TestEditDistance();
-    //TestGrayCode();
-    //TestBinaryTreeLCA();
-    //TestCombineKoutofN();
-    //TestWordLadder();
-    //TestMyGraph();
-    //TestKnapsack01();
+    TestGenericSort();
+  
     ::getchar();
     
     return 0;

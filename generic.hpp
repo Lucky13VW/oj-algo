@@ -13,8 +13,635 @@
 #include <algorithm>
 #include <functional>
 #include <math.h>
+#include <time.h>
 
 using namespace std;
+
+/*
+   Binary heap implementation
+*/
+
+template<class type>
+struct MinHeapOpt
+{
+    static bool Compare(const type &dat1, const type &dat2)
+    {
+        return dat1 <= dat2;
+    }
+};
+
+template<class type>
+struct MaxHeapOpt
+{
+    static bool Compare(const type &dat1, const type &dat2)
+    {
+        return dat1 >= dat2;
+    }
+};
+
+template<class DataType, class HeapType = MinHeapOpt<DataType>>
+class BasicBinaryHeap
+{
+public:
+    BasicBinaryHeap(size_t size = INT_MAX)
+        :SizeMax_(size),
+        DataSize_(0)
+    {
+        // arr[0] is reserved, start from 1
+        Data_.push_back(DataType());
+    }
+
+    virtual ~BasicBinaryHeap() = default;
+
+    void Insert(const DataType &data)
+    {
+        if (DataSize_ < SizeMax_)
+        {
+            DataSize_++;
+            Data_.push_back(data);
+        }
+        else Data_[DataSize_] = data; // overwirte the latest one
+        Swim(DataSize_);
+    }
+
+    bool Empty() const
+    {
+        return DataSize_ == 0;
+    }
+
+    DataType Top() const
+    {
+        return Data_.size() > 1 ? Data_[1] : DataType();
+    }
+
+    void Pop()
+    {
+        // swap top and last
+        swap(Data_[DataSize_], Data_[1]);
+        Data_.pop_back();
+        DataSize_--;
+        Sink(1);
+    }
+
+private:
+    bool Compare(int n1, int n2)
+    {
+        return HeapType::Compare(Data_[n1], Data_[n2]);
+    }
+
+    void Swim(int index)
+    {
+        // compare index and its parent index/2
+        int parent = index / 2;
+        while (index>1 && Compare(index, parent))
+        {
+            swap(Data_[index], Data_[parent]);
+            index = parent;
+            parent /= 2;
+        }
+    }
+
+    void Sink(int index)
+    {
+        int child = index*2;
+        while (child <= DataSize_)
+        {
+            // choose between left and right
+            if (child < DataSize_ && Compare(child + 1, child)) child++;
+
+            if (Compare(child, index))  swap(Data_[child], Data_[index]);
+            else break;
+            index = child;
+            child *= 2;
+        }
+    }
+
+private:
+    size_t SizeMax_;
+    size_t DataSize_;
+    vector<DataType> Data_;
+};
+
+/*
+Sort Summary
+*/
+template<class type>
+class SortAlgo
+{
+public:
+    SortAlgo() = default;
+    virtual ~SortAlgo() {}
+
+    virtual void Sort(vector<type> &arr) = 0;
+    
+    void Shuffle(vector<type> &arr)
+    {
+        //max of rand is defined by RAND_MAX 0x7fff
+        
+        // set random seed 
+        srand((int)time(NULL));
+        int N = arr.size();
+        for (int i = 0; i < N; i++)
+        {
+            int r = rand()%N;
+            swap(arr[i],arr[r]);
+        }
+    }
+};
+
+//  Heapsort
+template<class type>
+class HeapSort : public SortAlgo<type>
+{
+public:
+    /* can be optimized as this
+    void sort(Comparable[] a)
+    {
+    int N = a.length;
+    for (int k = N/2; k >= 1; k--) sink(a, k, N);
+
+    while (N > 1)
+    {
+        exch(a, 1, N--);
+        sink(a, 1, N);
+    }
+    }
+    */
+    virtual void Sort(vector<type> &arr)
+    {
+        BasicBinaryHeap<type> sortor(arr.size());
+        for (auto &dat : arr) sortor.Insert(dat);
+
+        for (int i = 0; i < arr.size(); i++)
+        {
+            arr[i] = sortor.Top();
+            sortor.Pop();
+        }
+    }
+};
+
+// shell sort
+template<class type>
+class ShellSort : public SortAlgo<type>
+{
+public:
+    // N^(6/5) ~ NlogN, unstable
+    virtual void Sort(vector<type> &arr)
+    {
+        int N = arr.size();
+        int factor = 1;
+        // 1,4,13 
+        while (factor < N / 3) factor = factor * 3 + 1; 
+
+        while (factor > 0)
+        {
+            for (int i = factor; i < N; i++)
+            {
+                for (int j = i; j >= factor && 
+                    arr[j] < arr[j-factor]; j -= factor) swap(arr[j],arr[j-factor]);
+            }
+            factor /= 3;
+        }
+    }
+};
+
+// quick sort
+template<class type>
+class QuickSort : public SortAlgo<type>
+{
+public:
+    virtual void Sort(vector<type> &arr)
+    {
+        Shuffle(arr);
+        qsort(arr,0,arr.size()-1);
+    }
+
+private:
+    virtual void qsort(vector<type> &arr,int start ,int end)
+    {
+        if (start >= end) return;
+
+        int mid = partition(arr,start,end);
+        qsort(arr, start, mid-1);
+        qsort(arr, mid+1, end);
+    }
+
+    int partition(vector<type> &arr, int start, int end)
+    {
+        int lo = start;
+        int hi = end + 1;
+
+        int split = arr[start]; 
+        
+        while (true)
+        {
+            // from start+1 to end, find candidator
+            while (arr[++lo] < split) if (lo == end) break;
+            // from end to lo, find candidator
+            while (arr[--hi] > split) if (hi == start) break;
+
+            if (lo < hi) swap(arr[lo], arr[hi]);
+            else break;
+        }
+        swap(arr[start], arr[hi]);
+        return hi;
+    }
+};
+
+template<class type>
+class QuickSortThreeWay : public QuickSort<type>
+{
+private:
+    void qsort(vector<type> &arr, int start, int end)
+    {
+        if (start >= end) return;
+
+        int hi = end;
+        int lo = start;
+        int index = lo + 1;
+        int split = arr[lo];
+        // split into 3 part: samller, equal, bigger 
+        while (index <= hi)
+        {
+            if (arr[index] < split) swap(arr[lo++],arr[index++]);
+            else if (arr[index] > split) swap(arr[hi--], arr[index]);
+            else index++;
+        }
+        // arr[start..lo-1] <  split
+        qsort(arr,start,lo-1);
+        // arr[hi+1..end] >  split
+        qsort(arr,hi+1,end);
+    }
+};
+
+// merge sort
+template<class type>
+class MergeSort : public SortAlgo<type>
+{
+public:
+    virtual void Sort(vector<type> &arr)
+    {
+        Aux_.resize(arr.size(),0);
+        msort(arr,0,arr.size()-1);
+    }
+private:
+    // top to down sort
+    void msort(vector<type> &arr, int low, int high)
+    {
+        if (low >= high) return;
+
+        int mid = low + (high - low) / 2;
+        msort(arr, low, mid);
+        msort(arr, mid + 1, high);
+        merge(arr, low, mid, high);
+    }
+
+    // down to top sort
+    void msort(vector<int> &arr)
+    {
+        int N = arr.size();
+        // sub_size: subarray size
+        for (int sub_size = 1; sub_size < N; sub_size *= 2)
+        {
+            // sub_id: subarray index
+            for (int sub_id = 0; sub_id < N - sub_size; sub_id += sub_size*2)
+                merge(arr, sub_id, sub_id + sub_size - 1, min(sub_id + sub_size*2 -1,N-1));
+        }
+    }
+
+    // merge two sorted arry[low..mid,mid+1..high] into one
+    void merge(vector<type> &arr, int low,int mid, int high)
+    {
+        // copy to array aux 
+        for (int i = low; i <= high; i++) Aux_[i] = arr[i];
+        
+        // takes from tow arrys a1,a2
+        int a1 = low, a2 = mid + 1;
+        for (int i = low; i <= high; i++)
+        {
+            if (a1 > mid) arr[i] = Aux_[a2++]; // a1 is done
+            else if (a2 > high) arr[i] = Aux_[a1++]; // a2 is done
+            else if (Aux_[a1] < Aux_[a2]) arr[i] = Aux_[a1++]; // take a1
+            else arr[i] = Aux_[a2++]; // take a2
+        }
+    }
+
+private:
+    vector<type> Aux_;
+};
+
+// merge sort in place
+template<class type>
+class MergeSortInplace : public SortAlgo<type>
+{
+public:
+    virtual void Sort(vector<type> &arr)
+    {
+        msort(arr, 0, arr.size() - 1);
+    }
+private:
+    void msort(vector<type> &arr, int low, int high)
+    {
+        if (low >= high) return;
+
+        int mid = low + (high - low) / 2;
+        msort(arr,low,mid);
+        msort(arr,mid+1,high);
+        merge(arr,low,mid,high);
+    }
+
+
+    void merge(vector<type> &arr, int low, int mid, int high)
+    {
+        int i = low, j = mid + 1;
+        while (i < j && j <= high)
+        {
+            // i++ until arr[i] > arr[j]
+            while (i < j && arr[i] <= arr[j]) i++;
+            int index = j;
+            // j++ until arr[j] > arr[i]
+            while (j <= high && arr[j] < arr[i]) j++;
+            // shift arr[i..index) [index..j)
+            shift(arr,i,index-1,j-1);
+            // move i to 
+            i += j - index;
+        }
+    }
+    // arr[start..split..end] -> arr[split..end..start]
+    void shift(vector<type> &arr,int start, int split,int end)
+    {
+        flip(arr,start, split);
+        flip(arr,split+1, end);
+        flip(arr,start, end);
+    }
+
+    void flip(vector<type> &arr, int begin, int end)
+    {
+        while (begin < end) swap(arr[begin++], arr[end--]);
+    }
+};
+
+// string LSD(least significant digit) sort
+class StringLSDSort: public SortAlgo<string>
+{
+public:
+    virtual void Sort(vector<string> &StrArr)
+    {
+        if (StrArr.size() == 0) return;
+
+        int Radix = 256;
+
+        int str_len = StrArr[0].size();
+        int arr_len = StrArr.size();
+        // from right to left LSD
+        for (int d = str_len - 1; d >= 0; d--)
+        {
+            vector<int> count(Radix + 1, 0);
+            // compute frequency of each character, count[r+1!!!]  
+            for (int i = 0; i < arr_len; i++)
+                count[StrArr[i].at(d) + 1]++;
+
+            // change counts to indices
+            for (int i = 0; i < Radix; i++)
+                count[i + 1] += count[i];
+
+            // distribute it to temp array
+            // r = count[StrArr[i].at(d)]++ 
+            // '++' here is to handle same character, move r to next position in aux
+            vector<string> aux(arr_len, "");
+            for (int i = 0; i < arr_len; i++)
+                aux[count[StrArr[i].at(d)]++] = StrArr[i];
+
+            // save back to string array
+            for (int i = 0; i < arr_len; i++)
+                StrArr[i] = aux[i];
+        }
+    }
+};
+
+struct ComparerMax
+{
+    static int Value(int a, int b) { return max(a, b); }
+};
+
+struct ComparerMin
+{
+    static int Value(int a, int b) { return min(a, b); }
+};
+template<class Comparer = ComparerMin>
+class MyRMQst
+{
+public:
+    MyRMQst(vector<int> &nums)
+    {
+        SetData(nums);
+    }
+    MyRMQst() = default;
+    ~MyRMQst() = default;
+
+    // not correct
+    void SetData(vector<int> &nums)
+    {
+        // F[i, j] = min(F[i, j-1], F[i+2^(j-1), j-1])
+        int range = int(log(nums.size()) / log(2)) + 1;
+        int num_size = nums.size();
+        vector<int> temp(range, 0);
+        Data_.clear();
+        Data_.resize(num_size, temp);
+
+        for (int i = 1; i < num_size; i++) Data_[i][0] = nums[i];
+
+        for (int j = 1; j < range; j++)
+        {
+            for (int i = 1; i < num_size; i++)
+            {
+                int k = i + (1 << j) - 1;
+                if (k < num_size)
+                    Data_[i][j] = Comparer::Value(Data_[i][j - 1], Data_[i + (1 << (j - 1))][j - 1]);
+            }
+        }
+    }
+
+    int MostValue(int i, int j)
+    {
+        i++; j++;
+        if (i > j) swap(i, j);
+
+        // k=log2(j-i+1) 
+        int k = int(log(j - i + 1) / log(2));
+        // RMQ(i,j) = min(F[i,k], F[j-2^k+1,k])
+        return Comparer::Value(Data_[i][k], Data_[j + 1 - (1 << k)][k]);
+    }
+
+private:
+    vector<vector<int>> Data_;
+};
+
+/*
+Suffix Array Implementation
+*/
+class MySuffixArray
+{
+public:
+    MySuffixArray(const string &str)
+    {
+        SetString(str);
+    }
+    MySuffixArray() = default;
+    virtual ~MySuffixArray() {}
+
+    void SetString(const string &str)
+    {
+        RawString_ = str;
+        SA_.clear();
+        for (int i = 0; i < str.size(); i++)
+        {
+            SA_.push_back(i);
+        }
+        sort(SA_.begin(), SA_.end(), [&](int offset1, int offset2)
+        { return RawString_.substr(offset1) < RawString_.substr(offset2); });
+
+        // calculate rank, the raw index in SA
+        Rank_.resize(SA_.size(), 0);
+        for (int i = 0; i < SA_.size(); i++)
+        {
+            Rank_[SA_[i]] = i;
+        }
+        // calculate height array height[i] = LCP(i,i-1)
+        Height_.resize(SA_.size(), 0);
+        for (int i = 1; i < SA_.size(); i++)
+        {
+            Height_[i] = TwoStringLCP(SuffixStr(i), SuffixStr(i - 1));
+        }
+        RMQmin_.SetData(Height_);
+    }
+
+    int Rank(const string &pat)
+    {
+        int lo = 0;
+        int hi = SA_.size() - 1;
+        while (lo <= hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            const string &suffix = SuffixStr(mid);
+            if (pat < suffix)  hi = mid - 1;
+            else if (pat > suffix) lo = mid + 1;
+            else return mid;
+        }
+
+        return lo;
+    }
+
+    int Substring(const string &pat)
+    {
+        int lo = 0;
+        int hi = SA_.size() - 1;
+        while (lo <= hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            const string &suffix = SuffixStr(mid);
+            // search for prefix matched string in suffix
+            int res = suffix.compare(0, pat.size(), pat);
+            if (res>0)  hi = mid - 1;
+            else if (res<0) lo = mid + 1;
+            else return SA_[mid];
+        }
+
+        return -1;
+    }
+
+    // Longest Common Substring
+    string LCS(int split)
+    {
+        int max = 0;
+        int index = 0;
+        for (int i = 1; i < Height_.size(); i++)
+        {
+            if (Height_[i] > max &&
+                (SA_[i - 1] - split)*(SA_[i] - split) < 0)
+            {
+                max = Height_[i];
+                index = i;
+
+            }
+        }
+        return SuffixStr(index).substr(0, Height_[index]);
+    }
+
+    // Longest Palindromic Substring
+    /*
+    S="aabaaaab",  SS'="aabaaab$baaabaa",str(ss)=len , search from 1 to len(s)
+    find the LCP(i and len-i) consider odd and even
+    */
+    string LPS(int split)
+    {
+        int max = 0;
+        int index = 0;
+        for (int i = 1; i < RawString_.size() / 2; i++)
+        {
+            // odd i is the center of palindromic string LCP(i,len-i-1) 
+            // xx|i.......|(len-i-1)xxx
+            int lcp = LCP(i, RawString_.size() - i - 1);
+            if (lcp * 2 - 1 > max)
+            {
+                max = lcp * 2 - 1;
+                index = i - lcp + 1;
+            }
+            // even xx|i.......|(len-i)xx
+            lcp = LCP(i, RawString_.size() - i);
+            if (lcp * 2 > max)
+            {
+                max = lcp * 2;
+                index = i - lcp;
+            }
+        }
+        return RawString_.substr(index, max);
+    }
+
+private:
+    string SuffixStr(int sa_index)
+    {
+        return RawString_.substr(SA_[sa_index]);
+    }
+
+    // lcp(RawString[index1],RawString[index2])
+    int LCP(int index1, int index2)
+    {
+        int first = Rank_[index1];
+        int second = Rank_[index2];
+        if (first > second) swap(first, second);
+
+        int min = INT_MAX;
+        for (int i = first + 1; i <= second; i++)
+        {
+            if (min > Height_[i]) min = Height_[i];
+        }
+        return min;
+    }
+
+    int LCPRMQ(int index1, int index2)
+    {
+        return RMQmin_.MostValue(Rank_[index1], Rank_[index2]);
+    }
+
+    int TwoStringLCP(const string &str1, const string &str2)
+    {
+        int len = min(str1.size(), str2.size());
+        for (int i = 0; i < len; i++)
+        {
+            if (str1[i] != str2[i]) return i;
+        }
+        return  len;
+    }
+
+
+private:
+    vector<int> SA_;
+    vector<int> Rank_;
+    vector<int> Height_;
+    string RawString_;
+    MyRMQst<> RMQmin_;
+};
 
 struct ListNode
 {
@@ -577,118 +1204,9 @@ private:
     map<string, list<VertexPtr>> VertexAdjacents_;
 };
 
-class Combinate
-{
-public:
-  
-    void TotalC(int arr[], int count)
-    {
-        int total_num = (1<<count)-1;
-        for(int i=1; i< total_num+1;i++)
-        {
-            int j = 1,idx=0;
-            vector<int> disp;
-            while(j<=i)
-            {
-                if(j&i)
-                {
-                    disp.push_back(arr[idx]);
-                }
-                j<<=1;
-                idx++;
-            }
-            PrintList(disp);
-        }
-    }
-    
-private:
-    void PrintList(const vector<int>&vec)
-    {
-        vector<int>::const_iterator iter=vec.begin();
-        for(;iter!=vec.end();iter++)
-        {
-            cout<<*iter<<" ";
-        }
-        cout<<endl;
-    }
-
-public:
-    static void Test()
-    {
-        const int count=3;
-        int arr[count]={1,2,3};
-        Combinate comb;
-        comb.TotalC(arr,count);
-    }
-};
-
-class Permutate
-{
-public:
-    
-    void TotalP(int arr[],int count,int index,int need=0)
-    {
-        if (need == 0)
-            need = count;
-                               
-        if( index == need)
-        {
-            PrintArr(arr,need);
-            return;
-        }
-        
-        for(int i=index;i<count;i++)
-        {
-            Swap(arr[i],arr[index]);
-            TotalP(arr,count,index+1,need);
-            Swap(arr[i],arr[index]);
-        }
-    }
-
-    void TotalPStl(int arr[], int count)
-    {
-        int total = 0;
-        bool is_ok = false;
-        do
-        {
-            is_ok = next_permutation(arr,arr+count);
-            PrintArr(arr,count);
-            total++;
-        }while(is_ok);
-
-        while(prev_permutation(arr,arr+count))
-        {
-            PrintArr(arr,count);
-            total++;
-        }
-        cout<<"total:"<<total<<endl;
-    }
-    
-private:
-    void PrintArr(int arr[],int count)
-    {
-         for(int j=0;j<count;j++)
-             cout<<arr[j]<<" ";
-         cout<<endl;
-    }
-
-    void Swap(int &arr1, int &arr2)
-    {
-        if (arr1 != arr2)
-            swap(arr1,arr2);
-    }
-    
-public:
-    static void Test()
-    {
-        const int count = 3;
-        int data[count]={1,2,3};
-        Permutate per;
-        per.TotalP(data,count,0,3);
-        //per.TotalPStl(data,count);
-    }  
-};
-
+/*
+Basic Dynamic Programming 
+*/
 class BasicDP
 {
 public:
@@ -922,262 +1440,6 @@ public:
             return BinarySearchTree(root->right,node1,node2);
         else 
             return root;
-    }
-};
-
-class ComparerMin
-{
-public:
-    static int Value(int a, int b) { return min(a, b); }
-};
-template<class Comparer= ComparerMin>
-class MyRMQst
-{
-public:
-    MyRMQst(vector<int> &nums)
-    {
-        SetData(nums);
-    }
-    MyRMQst() = default;
-    ~MyRMQst() = default;
-
-    // not correct
-    void SetData(vector<int> &nums)
-    {
-        // F[i, j] = min(F[i, j-1], F[i+2^(j-1), j-1])
-        int range = int(log(nums.size())/log(2))+1;
-        int num_size = nums.size()+1;
-        vector<int> temp(range, 0);
-        Data_.clear();
-        Data_.resize(num_size,temp);
-
-        for (int i = 1; i < num_size; i++) Data_[i][0] = nums[i-1];
-
-        for (int j = 1; j < range; j++)
-        {
-            for (int i = 1; i < num_size; i++)
-            {
-                int k = i + (1 << j) - 1;
-                if (k < num_size)
-                    Data_[i][j]= Comparer::Value(Data_[i][j - 1], Data_[i + (1 << (j - 1))][j - 1]);
-            }
-        }
-    }
-
-    int MostValue(int i, int j)
-    {
-        i++; j++;
-        if (i > j) swap(i, j);
-
-        // k=log2(j-i+1) 
-        int k = int(log(j - i + 1) / log(2));
-        // RMQ(i,j) = min(F[i,k], F[j-2^k+1,k])
-        return Comparer::Value(Data_[i][k], Data_[j + 1 - (1 << k)][k]);
-    }
-
-private:
-    vector<vector<int>> Data_;
-};
-
-class MySuffixArray
-{
-
-public:
-    MySuffixArray(const string &str)
-    {
-        SetString(str);
-    }
-    MySuffixArray() = default;
-    ~MySuffixArray() = default;
-    
-    void SetString(const string &str)
-    {
-        RawString_ = str;
-        SA_.clear();
-        for (int i = 0; i < str.size(); i++)
-        {
-            SA_.push_back(i);
-        }
-        sort(SA_.begin(), SA_.end(), [&](int offset1, int offset2) 
-        { return RawString_.substr(offset1) < RawString_.substr(offset2); });
-
-        // calculate rank, the raw index in SA
-        Rank_.resize(SA_.size(),0);
-        for (int i = 0; i < SA_.size(); i++)
-        {
-            Rank_[SA_[i]] = i;
-        }
-        // calculate height array height[i] = LCP(i,i-1)
-        Height_.resize(SA_.size(), 0);
-        for (int i = 1; i < SA_.size(); i++)
-        {
-            Height_[i] = TwoStringLCP(SuffixStr(i) , SuffixStr(i-1));
-        }
-        RMQmin_.SetData(Height_);
-    }
-
-    int Rank(const string &pat)
-    {
-        int lo = 0;
-        int hi = SA_.size() - 1;
-        while (lo <= hi)
-        {
-            int mid = lo + (hi - lo) / 2;
-            const string &suffix = SuffixStr(mid);
-            if (pat < suffix)  hi = mid - 1;
-            else if (pat > suffix) lo = mid + 1;
-            else return mid;
-        }
-        
-        return lo;
-    }
-
-    int Substring(const string &pat)
-    {
-        int lo = 0;
-        int hi = SA_.size() - 1;
-        while (lo <= hi)
-        {
-            int mid = lo + (hi - lo) / 2;
-            const string &suffix = SuffixStr(mid);
-            // search for prefix matched string in suffix
-            int res = suffix.compare(0,pat.size(),pat);
-            if (res>0)  hi = mid - 1;
-            else if (res<0) lo = mid + 1;
-            else return SA_[mid];
-        }
-        
-        return -1;
-    }
-
-    // Longest Common Substring
-    string LCS(int split)
-    {
-        int max = 0;
-        int index = 0;
-        for (int i = 1; i < Height_.size(); i++)
-        {
-            if (Height_[i] > max &&
-                (SA_[i - 1] - split)*(SA_[i] - split) < 0)
-            {
-                max = Height_[i];
-                index = i;
-
-            }
-        }
-        return SuffixStr(index).substr(0, Height_[index]);
-    }
-
-    // Longest Palindromic Substring
-    /*
-    S="aabaaaab",  SS'="aabaaab$baaabaa",str(ss)=len , search from 1 to len(s)
-    find the LCP(i and len-i) consider odd and even
-    */
-    string LPS(int split)
-    {
-        int max = 0;
-        int index = 0;
-        for (int i = 1; i < RawString_.size()/2; i++)
-        {
-            // odd i is the center of palindromic string LCP(i,len-i-1) 
-            // xx|i.......|(len-i-1)xxx
-            int lcp = LCP(i, RawString_.size() - i -1);
-            if(lcp*2-1 > max)
-            {
-                max = lcp*2-1;
-                index = i-lcp+1;
-            }
-            // even xx|i.......|(len-i)xx
-            lcp = LCP(i, RawString_.size() - i );
-            if (lcp*2 > max)
-            {
-                max = lcp*2;
-                index = i-lcp;
-             }
-        }
-        return RawString_.substr(index, max);
-    }
-
-private:
-    string SuffixStr(int sa_index)
-    {
-        return RawString_.substr(SA_[sa_index]);
-    }
-
-    // lcp(RawString[index1],RawString[index2])
-    int LCP(int index1, int index2)
-    {
-        int first = Rank_[index1];
-        int second = Rank_[index2];
-        if (first > second) swap(first,second);
-
-        int min = INT_MAX;
-        for (int i = first+1; i <= second; i++) 
-        {
-            if (min > Height_[i]) min = Height_[i];
-        }
-        return min;
-    }
-
-    int LCPRMQ(int index1, int index2)
-    {
-        return RMQmin_.MostValue(Rank_[index1], Rank_[index2]);
-    }
-
-    int TwoStringLCP(const string &str1,const string &str2)
-    {
-        int len = min(str1.size(),str2.size());
-        for (int i = 0; i < len; i++)
-        {
-            if (str1[i] != str2[i]) return i;
-        }
-        return  len;
-    }
-
-   
-private:
-    vector<int> SA_;
-    vector<int> Rank_;
-    vector<int> Height_;
-    string RawString_;
-    MyRMQst<> RMQmin_;
-};
-
-// string LSD(least significant digit) sort
-class LSDSort
-{
-public:
-    void Sort(vector<string> &StrArr)
-    {
-        if (StrArr.size() == 0) return;
-
-        int Radix = 256;
-        
-        int str_len = StrArr[0].size();
-        int arr_len = StrArr.size();
-        // from right to left LSD
-        for (int d = str_len - 1; d >= 0; d--)
-        {
-            vector<int> count(Radix+1, 0);
-            // compute frequency of each character, count[r+1!!!]  
-            for (int i = 0; i < arr_len; i++) 
-                count[StrArr[i].at(d) + 1]++;
-
-            // change counts to indices
-            for (int i = 0; i < Radix; i++) 
-                count[i + 1] += count[i];
-
-            // distribute it to temp array
-            // r = count[StrArr[i].at(d)]++ 
-            // '++' here is to handle same character, move r to next position in aux
-            vector<string> aux(arr_len,"");
-            for (int i = 0; i < arr_len; i++) 
-                aux[count[StrArr[i].at(d)]++] = StrArr[i]; 
-
-            // save back to string array
-            for (int i = 0; i < arr_len; i++)
-                StrArr[i] = aux[i];
-        }
     }
 };
 
