@@ -10,7 +10,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 200 Number of Islands 32.2% 	Medium 
 * 48  Rotate Image 37.1% 	Medium 
 218 The Skyline Problem 25.5% Hard 
-88 Merge Sorted Array 31.4% Easy 
+* 88 Merge Sorted Array 31.4% Easy 
 186 Reverse Words in a String II 28.5% Medium 
 268 Missing Number 43.5% Medium 
 * 1 Two Sum 29.8% Easy 
@@ -28,9 +28,9 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 445 Add Two Numbers II 46.2% Medium 
 117 Populating Next Right Pointers in Each Node II 33.5% Hard 
 168 Excel Sheet Column Title 24.4% Easy 
-2 Add Two Numbers 26.2% Medium 
-21 Merge Two Sorted Lists 37.9% Easy 
-8 String to Integer (atoi) 13.8% Easy 
+* 2 Add Two Numbers 26.2% Medium 
+* 21 Merge Two Sorted Lists 37.9% Easy 
+* 8 String to Integer (atoi) 13.8% Easy 
 174 Dungeon Game 22.8% Hard 
 * 20 Valid Parentheses 32.1% Easy 
 * 98 Validate Binary Search Tree 22.3% Medium 
@@ -45,7 +45,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 160 Intersection of Two Linked Lists 30.0% Easy 
 215 Kth Largest Element in an Array 37.4% Medium 
 26 Remove Duplicates from Sorted Array 35.3% Easy 
-4 Median of Two Sorted Arrays 20.8% Hard 
+* 4 Median of Two Sorted Arrays 20.8% Hard 
 232 Implement Queue using Stacks 34.9% Easy 
 * 102 Binary Tree Level Order Traversal 36.9% Easy 
 189 Rotate Array 23.5% Easy 
@@ -65,7 +65,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 46 Permutations 40.3% Medium 
 91 Decode Ways 18.8% Medium 
 * 94 Binary Tree Inorder Traversal 43.7% 		Medium 
-165 Compare Version Numbers 19.2% Easy 
+* 165 Compare Version Numbers 19.2% Easy 
 28 Implement strStr() 26.9% Easy 
 101 Symmetric Tree 36.9% Easy 
 162 Find Peak Element 35.8% Medium 

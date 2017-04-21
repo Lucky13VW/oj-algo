@@ -278,7 +278,7 @@ static void TestSuffixArray()
 {
     string str = "madam";
     string pat = "am";
-    MySuffixArray sa(str);
+    SuffixArray sa(str);
     cout << str <<".substr("<< pat << ")=" << sa.Substring(pat) << endl;;
 
     str = "abdefcabdefcbutst";
@@ -286,41 +286,46 @@ static void TestSuffixArray()
 
     stringstream ss;
     ss << str << "$" << pat;
-    sa.SetString(ss.str());
+    sa.SetupSuffixArray(ss.str());
     cout << "LCS(" << str << "," << pat << "):" << sa.LCS(str.size()) << endl;
     
     str = "abcd1ghg2dcba";
+    ss.clear();
     ss.str(""); // right way to clear stringstream
     ss << str << "$";
     string rev_str = str;
     reverse(rev_str.begin(), rev_str.end());
     ss << rev_str;
-    sa.SetString(ss.str());
+    sa.SetupSuffixArray(ss.str());
     cout << "LPS(" << str <<"):" << sa.LPS(str.size()) << endl;
 }
 
 static void TestLPS()
 {
     stringstream ss;
-    string str = "abcd1ghg2dcba";
+    string str = "abcd1ghhg2dcba";
     
     ss << str << "$";
     string rev_str = str;
     reverse(rev_str.begin(), rev_str.end());
     ss << rev_str;
 
-    MySuffixArray sa;
-    sa.SetString(ss.str());
+    SuffixArrayWithRMQ sa;
+    sa.SetupSuffixArray(ss.str());
     cout << "LPS(" << str << "):" << sa.LPS(str.size()) << endl;
 }
 
 static void TestRMQ()
 {
-    vector<int> nums{ 3,5,5,0,9,6,2,1};
+    vector<int> nums{ 9,8,7,6,5,4,3,2,1};
     MyRMQst<> rmq(nums);
     for (auto num : nums) cout << num << " ";
     cout << endl;
-    cout<< rmq.MostValue(0, 5) <<endl;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        cout << rmq.MostValue(0, i) << endl;
+    }
+    cout << rmq.MostValue(3, 7) << endl;
 }
 
 static void TestLSDSort()
@@ -372,11 +377,23 @@ static void TestBinaryHeap()
     cout << bh.Top() << endl;
 }
 
+static void TestUF()
+{
+    UnionFind uf(10);
+    uf.Union(2, 3);
+    uf.Union(6, 5);
+    uf.Union(5, 8);
+    cout << uf.Connected(6, 8) << endl;
+    cout << uf.Connected(6, 3) << endl;
+    uf.Union(2,8);
+    cout << uf.Connected(2, 3) << endl;
+}
 
 int main(int argc,char *argv[])
 {
-    TestGenericSort();
-  
+    LongestCommonPrefix sln;
+    vector<string> strs{"a","b"};
+    cout << sln.Solution(strs) << endl;
     ::getchar();
     
     return 0;

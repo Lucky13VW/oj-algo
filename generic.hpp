@@ -43,8 +43,8 @@ template<class DataType, class HeapType = MinHeapOpt<DataType>>
 class BasicBinaryHeap
 {
 public:
-    BasicBinaryHeap(size_t size = INT_MAX)
-        :SizeMax_(size),
+    BasicBinaryHeap(size_t max_size = INT_MAX)
+        :SizeMax_(max_size),
         DataSize_(0)
     {
         // arr[0] is reserved, start from 1
@@ -419,6 +419,100 @@ public:
     }
 };
 
+/*
+Union-Find
+*/
+class UnionFind
+{
+public:
+    UnionFind() = default;
+    ~UnionFind() = default;
+
+    UnionFind(size_t size)
+    {
+        ResetUF(size);
+    }
+
+    void ResetUF(size_t size)
+    {
+        Member_.resize(size, 0);
+        Rank_.resize(size, 0);
+        for (int i = 0; i < size; i++)
+        {
+            Member_[i] = i;
+            Rank_[i] = 1;
+        }
+        Count_ = size;
+    }
+
+    bool Connected(int id1, int id2)
+    {
+        return Find(id1) == Find(id2);
+    }
+
+    // union with rank
+    void UnionWithRank(int id1,int id2)
+    {
+        int boss1 = Find(id1);
+        int boss2 = Find(id2);
+
+        if (boss1 == boss2) return;
+
+        if (Rank_[boss1] < Rank_[boss2])
+        {
+            Member_[id1] = boss2;
+            Rank_[boss2] += Rank_[boss1];
+        }
+        else
+        {
+            Member_[id2] = boss1;
+            Rank_[boss1] += Rank_[boss2];
+        }
+        Count_--;
+    }
+
+    void Union(int id1, int id2)
+    {
+        int boss1 = Find(id1);
+        int boss2 = Find(id2);
+
+        if (boss1 == boss2) return;
+
+        Member_[boss1] = boss2;
+        Count_--;
+    }
+
+    // find with path compress
+    /*
+    int find(int id)
+        if(id != arr[id]) arr[id] = find(arr[id]);
+        return arr[id];
+    */
+    int Find(int id)
+    {
+        // find the boss of this union
+        int boss = id;
+        while (boss != Member_[boss]) boss = Member_[boss];
+
+        int curr = id;
+        int parent;
+        // refresh the parent to boss
+        while (curr != boss) 
+        {
+            parent = Member_[curr];
+            Member_[curr] = boss;
+            curr = parent;
+        }
+        //Rank_[boss] = 2; // path reset to 2
+        return boss;
+    }
+
+private:
+    size_t Count_;
+    vector<int> Member_;
+    vector<int> Rank_; // optional, prefere path compress
+};
+
 struct ComparerMax
 {
     static int Value(int a, int b) { return max(a, b); }
@@ -443,28 +537,27 @@ public:
     void SetData(vector<int> &nums)
     {
         // F[i, j] = min(F[i, j-1], F[i+2^(j-1), j-1])
-        int range = int(log(nums.size()) / log(2)) + 1;
+        int range = int(log(nums.size()) / log(2))+1;
         int num_size = nums.size();
         vector<int> temp(range, 0);
         Data_.clear();
         Data_.resize(num_size, temp);
 
-        for (int i = 1; i < num_size; i++) Data_[i][0] = nums[i];
+        for (int i = 0; i < num_size; i++) Data_[i][0] = nums[i];
 
         for (int j = 1; j < range; j++)
         {
-            for (int i = 1; i < num_size; i++)
+            for (int i = 0; i < num_size; i++)
             {
-                int k = i + (1 << j) - 1;
+                int k = i + (1 << (j- 1));
                 if (k < num_size)
-                    Data_[i][j] = Comparer::Value(Data_[i][j - 1], Data_[i + (1 << (j - 1))][j - 1]);
+                    Data_[i][j] = Comparer::Value(Data_[i][j - 1], Data_[k][j - 1]);
             }
         }
     }
 
     int MostValue(int i, int j)
     {
-        i++; j++;
         if (i > j) swap(i, j);
 
         // k=log2(j-i+1) 
@@ -480,40 +573,19 @@ private:
 /*
 Suffix Array Implementation
 */
-class MySuffixArray
+class SuffixArray
 {
 public:
-    MySuffixArray(const string &str)
+    SuffixArray(const string &str)
     {
         SetString(str);
     }
-    MySuffixArray() = default;
-    virtual ~MySuffixArray() {}
+    SuffixArray() = default;
+    virtual ~SuffixArray() {}
 
-    void SetString(const string &str)
+    virtual void SetupSuffixArray(const string &str)
     {
-        RawString_ = str;
-        SA_.clear();
-        for (int i = 0; i < str.size(); i++)
-        {
-            SA_.push_back(i);
-        }
-        sort(SA_.begin(), SA_.end(), [&](int offset1, int offset2)
-        { return RawString_.substr(offset1) < RawString_.substr(offset2); });
-
-        // calculate rank, the raw index in SA
-        Rank_.resize(SA_.size(), 0);
-        for (int i = 0; i < SA_.size(); i++)
-        {
-            Rank_[SA_[i]] = i;
-        }
-        // calculate height array height[i] = LCP(i,i-1)
-        Height_.resize(SA_.size(), 0);
-        for (int i = 1; i < SA_.size(); i++)
-        {
-            Height_[i] = TwoStringLCP(SuffixStr(i), SuffixStr(i - 1));
-        }
-        RMQmin_.SetData(Height_);
+        SetString(str);
     }
 
     int Rank(const string &pat)
@@ -523,9 +595,10 @@ public:
         while (lo <= hi)
         {
             int mid = lo + (hi - lo) / 2;
-            const string &suffix = SuffixStr(mid);
-            if (pat < suffix)  hi = mid - 1;
-            else if (pat > suffix) lo = mid + 1;
+            const char *suffix = SuffixStr(mid);
+            int res = strcmp(pat.c_str(),suffix);
+            if ( res < 0 )  hi = mid - 1;
+            else if (res > 0) lo = mid + 1;
             else return mid;
         }
 
@@ -539,7 +612,7 @@ public:
         while (lo <= hi)
         {
             int mid = lo + (hi - lo) / 2;
-            const string &suffix = SuffixStr(mid);
+            string suffix(SuffixStr(mid));
             // search for prefix matched string in suffix
             int res = suffix.compare(0, pat.size(), pat);
             if (res>0)  hi = mid - 1;
@@ -565,7 +638,7 @@ public:
 
             }
         }
-        return SuffixStr(index).substr(0, Height_[index]);
+        return string(SuffixStr(index)).substr(0, Height_[index]);
     }
 
     // Longest Palindromic Substring
@@ -577,18 +650,19 @@ public:
     {
         int max = 0;
         int index = 0;
-        for (int i = 1; i < RawString_.size() / 2; i++)
+        int str_size = RawString_.size();
+        for (int i = 1; i < str_size / 2; i++)
         {
             // odd i is the center of palindromic string LCP(i,len-i-1) 
             // xx|i.......|(len-i-1)xxx
-            int lcp = LCP(i, RawString_.size() - i - 1);
+            int lcp = LCP(i, str_size - i - 1);
             if (lcp * 2 - 1 > max)
             {
                 max = lcp * 2 - 1;
                 index = i - lcp + 1;
             }
             // even xx|i.......|(len-i)xx
-            lcp = LCP(i, RawString_.size() - i);
+            lcp = LCP(i, str_size - i);
             if (lcp * 2 > max)
             {
                 max = lcp * 2;
@@ -599,19 +673,45 @@ public:
     }
 
 private:
-    string SuffixStr(int sa_index)
+    void SetString(const string &str)
     {
-        return RawString_.substr(SA_[sa_index]);
+        RawString_ = str;
+        SA_.clear();
+        for (int i = 0; i < str.size(); i++)
+        {
+            SA_.push_back(i);
+        }
+        sort(SA_.begin(), SA_.end(), [&](int offset1, int offset2)
+        { return strcmp(RawString_.c_str() + offset1, RawString_.c_str() + offset2) <= 0; });
+
+        // calculate rank, the raw index in SA
+        Rank_.resize(SA_.size(), 0);
+        for (int i = 0; i < SA_.size(); i++)
+        {
+            Rank_[SA_[i]] = i;
+        }
+        // calculate height array height[i] = LCP(i,i-1)
+        Height_.resize(SA_.size(), 0);
+        for (int i = 1; i < SA_.size(); i++)
+        {
+            Height_[i] = TwoStringLCP(SuffixStr(i), SuffixStr(i - 1));
+        }
+    }
+
+    const char* SuffixStr(int sa_index)
+    {
+        return RawString_.c_str()+SA_[sa_index];
     }
 
     // lcp(RawString[index1],RawString[index2])
-    int LCP(int index1, int index2)
+    virtual int LCP(int index1, int index2)
     {
         int first = Rank_[index1];
         int second = Rank_[index2];
         if (first > second) swap(first, second);
 
         int min = INT_MAX;
+        // from first+1 ~ second
         for (int i = first + 1; i <= second; i++)
         {
             if (min > Height_[i]) min = Height_[i];
@@ -619,14 +719,9 @@ private:
         return min;
     }
 
-    int LCPRMQ(int index1, int index2)
+    int TwoStringLCP(const char *str1, const char *str2)
     {
-        return RMQmin_.MostValue(Rank_[index1], Rank_[index2]);
-    }
-
-    int TwoStringLCP(const string &str1, const string &str2)
-    {
-        int len = min(str1.size(), str2.size());
+        int len = min(strlen(str1), strlen(str2));
         for (int i = 0; i < len; i++)
         {
             if (str1[i] != str2[i]) return i;
@@ -635,11 +730,43 @@ private:
     }
 
 
-private:
+protected:
     vector<int> SA_;
     vector<int> Rank_;
     vector<int> Height_;
     string RawString_;
+};
+
+class SuffixArrayWithRMQ : public SuffixArray
+{
+    typedef SuffixArray super;
+
+public:
+    SuffixArrayWithRMQ(const string &str)
+        :super(str)
+    {
+        RMQmin_.SetData(Height_);
+    }
+
+    SuffixArrayWithRMQ() = default;
+    virtual ~SuffixArrayWithRMQ() {}
+
+    virtual void SetupSuffixArray(const string &str)
+    {
+        super::SetupSuffixArray(str);
+        RMQmin_.SetData(Height_);
+    }
+
+private:
+    virtual int LCP(int index1, int index2)
+    {
+        int first = Rank_[index1];
+        int second = Rank_[index2];
+        if (first > second) swap(first, second);
+        return RMQmin_.MostValue(first+1, second);
+    }
+
+private:
     MyRMQst<> RMQmin_;
 };
 

@@ -87,47 +87,44 @@ class AddTwoNumbersSolution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
     {
-        ListNode*iter1=l1,*iter2=l2;
-        stack<int> my_stack;
-        while(iter1!=NULL || iter2!=NULL)
+        ListNode *result = NULL, *prev = NULL;
+
+        int carry = 0;
+        while (l1 != NULL || l2 != NULL)
         {
-            int input1= 0, input2 = 0;
-            if(iter1!=NULL)
+            int sum = carry;
+            if (l1 == NULL)
             {
-                input1=iter1->val;
-                iter1=iter1->next; 
+                sum += l2->val;
+                l2 = l2->next;
             }
-            if(iter2!=NULL)
+            else if (l2 == NULL)
             {
-                input2=iter2->val;
-                iter2=iter2->next;
+                sum += l1->val;
+                l1 = l1->next;
             }
-            int value= input1 + input2;
-            my_stack.push(value);
+            else
+            {
+                sum += (l1->val + l2->val);
+                l1 = l1->next;
+                l2 = l2->next;
+            }
+
+            if (sum >= 10)
+            {
+                carry = 1;
+                sum -= 10;
+            }
+            else carry = 0;
+
+            ListNode *node = new ListNode(sum);
+            if (prev == NULL) result = prev = node;
+            else prev->next = node;
+            prev = node;
         }
-        ListNode *result=NULL,*prev=NULL;
-        int add=0;
-        while(!my_stack.empty())
+        if (carry == 1)
         {
-            int num = my_stack.top()+add;
-            add = 0;
-            my_stack.pop();
-            if(num>9) 
-            {
-                num-=10; 
-                add=1;
-            }
-            ListNode *cur = new ListNode(num);
-            
-            if(result==NULL) result=cur;
-            if(prev!=NULL) 
-                prev->next = cur;
-            prev=cur;
-        }
-        if(add == 1)
-        {
-           ListNode *add_one = new ListNode(1);
-           prev->next = add_one;
+            prev->next = new ListNode(carry);
         }
         return result;
     }
@@ -164,6 +161,42 @@ public:
             }
         }
         return result;
+    }
+};
+
+/*
+4. Median of Two Sorted Arrays
+Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+e.g:
+nums1 = [1, 3]
+nums2 = [2]
+The median is 2.0
+nums1 = [1, 2]
+nums2 = [3, 4]
+The median is (2 + 3)/2 = 2.5
+*/
+class MedianofTwoSortedArray 
+{
+public:
+    double Find(vector<int>& nums1, vector<int>& nums2)
+    {
+        if (nums1.size() == 0 && nums2.size() == 0) return 0;
+
+        bool is_even = (nums1.size() + nums2.size()) % 2 == 0;
+        int mid_size = (nums1.size() + nums2.size()) / 2 + 1;
+
+        int mid = 0, mid_pre = 0;
+        int id1 = 0, id2 = 0;
+        for (int index = 0; index<mid_size; index++)
+        {
+            mid_pre = mid;
+            if (id1 >= nums1.size()) mid = nums2[id2++];
+            else if (id2 >= nums2.size()) mid = nums1[id1++];
+            else if (nums1[id1]<nums2[id2]) mid = nums1[id1++];
+            else mid = nums2[id2++];
+        }
+
+        return is_even ? (mid + mid_pre) / 2.0 : mid;
     }
 };
 
@@ -204,59 +237,56 @@ public:
 /*
 7. Reverse Integer 
 x = 123, return 321, x = -123, return -321
+The input is assumed to be a 32-bit signed integer. 
+Your function should return 0 when the reversed integer overflows.
 */
 class ReverseInteger
 {
 public:
-    int Solution(int x) {
-        int flag = 1;
-        if (x<0)
-        {
-            flag = -1;
-            x = x*flag;
-        }
+    int Solution(int x) 
+    {
+        bool neg = x<0;
+        if (neg) x = -x;
+
         int res = 0;
         while (x>0)
         {
-            if ((INT_MAX - x % 10) / 10 >= res)
-            {
-                res = res * 10 + x % 10;
-                x = x / 10;
-            }
-            else
-            {
-                res = 0;
-                break;
-            }
+            int digit = x % 10;
+            if ((INT_MAX - digit) / 10 < res) return 0;
+            res = res * 10 + digit;
+            x /= 10;
         }
-        res = res*flag;
-        return res;
+        return neg ? -res : res;
     }
 };
 
 // 8. String to Integer (atoi)
-class MyAtoiSolution {
+class MyAtoiSolution 
+{
 public:
     int myAtoi(string str) 
     {
-        int total=0;
-        int sign=1;
-        size_t start = str.find_first_not_of(" ");
-        for(int i=start;i<str.size();i++)
+        int flag = 1;
+        int res = 0;
+        int start = str.find_first_not_of(" ");
+        for (int i = start; i<str.size(); i++)
         {
-            char val =str[i];
-            if(val >='0' && val<='9')
+            char val = str[i];
+            int digit = val - '0';
+            if (digit >= 0 && digit <= 9)
             {
-                if(total> INT_MAX/10 || (total==INT_MAX/10 && val-'0'>INT_MAX%10))
-                     return sign==1?INT_MAX:INT_MIN;
-                total=total*10+(val-'0');
+                if (res>INT_MAX / 10 || (res == INT_MAX / 10 && digit>INT_MAX % 10))
+                {
+                    return flag>0 ? INT_MAX : INT_MIN;
+                }
+                res = res * 10 + digit;
             }
-            else if('-' == val && i==start) sign=-1;
-            else if('+'==val && i==start) continue;
+            else if (i == start && val == '-') flag = -1;
+            else if (i == start && val == '+') continue;
             else break;
         }
-        
-        return total*sign;
+
+        return res*flag;
     }
 };
 
@@ -282,6 +312,70 @@ public:
         return (x == sum || x == sum / 10);
     }
 };
+
+/*
+13. Roman to Integer
+*/
+class RomanToInt 
+{
+public:
+    int Convert(string s)
+    {
+        if (s.size() == 0) return 0;
+
+        unordered_map<char, int> digit_map = { { 'I' , 1 },{ 'V' , 5 },{ 'X' , 10 },
+        { 'L' , 50 },{ 'C' , 100 },{ 'D' , 500 },{ 'M' , 1000 } };
+
+        int result = digit_map[s[s.size() - 1]];
+        int prev = result;
+        for (int i = s.size() - 2; i >= 0; i--)
+        {
+            int digit = digit_map[s[i]];
+            if (digit < prev) result -= digit;
+            else result += digit;
+            prev = digit;
+        }
+
+        return result;
+    }
+};
+
+/*
+14. Longest Common Prefix
+Write a function to find the longest common prefix string amongst an array of strings.
+*/
+class LongestCommonPrefix
+{
+public:
+    string Solution(vector<string>& strs)
+    {
+        if (strs.size() == 0) return "";
+
+        int len = strs[0].size();
+        int index = 0;
+        for (; index<len; index++)
+        {
+            int c = strs[0][index];
+            bool unmatched = false;
+            for (auto &str : strs)
+            {
+                if (index >= str.size())
+                {
+                    unmatched = true; break;
+                }
+
+                if (str[index] != c)
+                {
+                    unmatched = true; break;
+                }
+            }
+            if (unmatched) break;
+        }
+        
+        return strs[0].substr(0, index);
+    }
+};
+
 
 /*
 15. 3Sum
@@ -383,6 +477,47 @@ public:
             else return false;
         }
         return par.empty();
+    }
+};
+
+/*
+21. Merge Two Sorted Lists
+Merge two sorted linked lists and return it as a new list. 
+The new list should be made by splicing together the nodes of the first two lists.
+*/
+class Solution
+{
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
+    {
+        ListNode *result = NULL, *prev = NULL;
+        while (l1 != NULL || l2 != NULL)
+        {
+            ListNode *node = NULL;
+            if (l1 == NULL)
+            {
+                node = l2;
+                l2 = l2->next;
+            }
+            else if (l2 == NULL)
+            {
+                node = l1;
+                l1 = l1->next;
+            }
+            else if (l1->val<l2->val)
+            {
+                node = l1;
+                l1 = l1->next;
+            }
+            else
+            {
+                node = l2;
+                l2 = l2->next;
+            }
+            if (prev == NULL) result = prev = node;
+            else { prev->next = node; prev = node; }
+        }
+        return result;
     }
 };
 
@@ -763,6 +898,30 @@ class SortColors
 };
 
 /*
+88. Merge Sorted Array
+Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
+You may assume that nums1 has enough space (size that is greater or equal to m + n) 
+to hold additional elements from nums2. 
+The number of elements initialized in nums1 and nums2 are m and n respectively.
+*/
+class MergeSortedArray 
+{
+public:
+    void Merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        int index = m + n - 1;
+        int id1 = m - 1, id2 = n - 1;
+
+        while (id1 >= 0 && id2 >= 0)
+        {
+            if (nums1[id1]>nums2[id2]) nums1[index--] = nums1[id1--];
+            else nums1[index--] = nums2[id2--];
+        }
+        // only process id2 if remaining, id1 is in place
+        while (id2 >= 0) nums1[index--] = nums2[id2--];
+    }
+};
+
+/*
 89 Gray Code
 The gray code is a binary numeral system where two successive values differ in only one bit.
 Given a non-negative integer n representing the total number of bits in the code, 
@@ -1119,6 +1278,39 @@ public:
             new_node->next = curr == NULL ? NULL : curr->next;
         }
         return new_head;
+    }
+};
+
+/*
+165 Compare Version Numbers
+If version1 > version2 return 1, if version1 < version2 return -1, otherwise return 0.
+0.1 < 1.1 < 1.2 < 13.37
+*/
+class CompareVersionNumbers 
+{
+public:
+    int Comparee(string version1, string version2)
+    {
+        stringstream s1(version1);
+        stringstream s2(version2);
+
+        while (true)
+        {
+            string v1, v2;
+
+            istream &p1 = getline(s1, v1, '.');
+            istream &p2 = getline(s2, v2, '.');
+
+            if (!p1 && !p2) break;
+
+            int n1 = atoi(v1.c_str());
+            int n2 = atoi(v2.c_str());
+
+            if (n1 == n2) continue;
+            return n1>n2 ? 1 : -1;
+        }
+
+        return 0;
     }
 };
 
