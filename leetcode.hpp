@@ -314,6 +314,143 @@ public:
 };
 
 /*
+10. Regular Expression Matching
+'.' Matches any single character.
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+isMatch("ab", ".*") ¡ú true
+isMatch("aab", "c*a*b") ¡ú true
+*/
+
+// not correct
+class SimpleRegularExpression
+{
+public:
+    enum color
+    {
+        white = 0,
+        gray = 1,
+        black = 2
+    };
+
+    class NFAdg
+    {
+    public:
+        NFAdg(size_t size)
+        {
+            for (int i = 0; i<size; i++)
+            {
+                States_.push_back(set<int>());
+            }
+            Marked_.resize(size, white);
+        }
+
+        ~NFAdg() = default;
+
+        void AddEdge(int i, int j)
+        {
+            States_[i].insert(j);    
+        }
+
+        void RemoveEdge(int i, int j)
+        {
+            States_[i].erase(j);
+        }
+
+        void ResetVisit()
+        {
+            for (int i = 0; i < Marked_.size(); i++)
+                Marked_[i] = white;
+        }
+
+        void DFS(int i,vector<int> &visit)
+        {
+            if (Marked_[i] == white)
+            {
+                Marked_[i] = gray;
+                visit.push_back(i);
+                for (auto adj : States_[i]) DFS(adj,visit);
+                Marked_[i] = black;
+            }
+        }
+
+    private:
+        vector<set<int>> States_;
+        vector<color> Marked_;
+    };
+
+    bool isMatch(string s, string p)
+    {
+        if (p.size() == 0) return s.size() == 0;
+
+        if (p[0] != '(') p.insert(0, "(");
+        if (p[p.size() - 1] != ')') p.append(")");
+
+        int p_len = p.size();
+
+        // initialize pattern string
+        NFAdg e_dg(p_len + 1);
+        SetupNFAdg(p,e_dg);
+
+        vector<int> candidates;
+        e_dg.DFS(0,candidates);
+        
+        for (int i = 0; i<s.size(); i++)
+        {
+            vector<int> match;
+            for (int v : candidates)
+            {
+                if(v<p_len && (p[v] == s[i] || p[v] == '.')) 
+                    match.push_back(v + 1);
+            }
+
+            e_dg.ResetVisit();
+            candidates.clear();
+            for (auto v : match)
+            {
+                e_dg.DFS(v,candidates);
+            }
+        }
+
+        for (int v : candidates) if (v == p_len) return true;
+        return false;
+    }
+
+private:
+    void SetupNFAdg(const string &p, NFAdg &e_dg)
+    {
+        size_t p_len = p.size();
+        stack<int> ops;
+        for (int i = 0; i<p_len; i++)
+        {
+            int lp_id = i;
+            if (p[i] == '(' || p[i] == '|') ops.push(i);
+            else if (p[i] == ')')
+            {
+                int or_id = ops.top();
+                ops.pop();
+                if (p[or_id] == '|')
+                {
+                    // lp->(....|<-or...)<-i
+                    lp_id = ops.top();
+                    ops.pop();
+                    e_dg.AddEdge(lp_id, or_id + 1);
+                    e_dg.AddEdge(or_id, i);
+                }
+                else lp_id = or_id;
+            }
+            // two cases: lp->(...)*<-i+1  or  a* 
+            if (i<p_len - 1 && p[i + 1] == '*')
+            {
+                e_dg.AddEdge(lp_id, i + 1);
+                e_dg.AddEdge(i + 1, lp_id);
+            }
+            if (p[i] == '*' || p[i] == '(' || p[i] == ')') e_dg.AddEdge(i, i + 1);
+        }
+    }
+};
+
+/*
 13. Roman to Integer
 */
 class RomanToInt 
