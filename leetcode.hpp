@@ -326,26 +326,33 @@ isMatch("aab", "c*a*b") ¡ú true
 class SimpleRegularExpression
 {
 public:
-    enum color
-    {
-        white = 0,
-        gray = 1,
-        black = 2
-    };
-
     class NFAdg
     {
+        enum color
+        {
+            white = 0,
+            gray = 1,
+            black = 2
+        };
     public:
         NFAdg(size_t size)
+        {
+            SetVertex(size);
+        }
+        NFAdg() = default;
+        ~NFAdg() = default;
+
+        void SetVertex(size_t size)
         {
             for (int i = 0; i<size; i++)
             {
                 States_.push_back(set<int>());
             }
-            Marked_.resize(size, white);
-        }
 
-        ~NFAdg() = default;
+            int prev_marked_size = Marked_.size();
+            Marked_.resize(size, white);
+            if (prev_marked_size > 0) ResetVisit();
+        }
 
         void AddEdge(int i, int j)
         {
@@ -379,74 +386,93 @@ public:
         vector<color> Marked_;
     };
 
+    class RegExpNFA
+    {
+    public:
+        RegExpNFA() = default;
+        ~RegExpNFA() = default;
+
+        RegExpNFA(const string &pat) { SetPattern(pat); }
+
+        void SetPattern(const string &pattern)
+        {
+            if (pattern.size() == 0) return;
+
+            Pattern_ = pattern;
+            if (Pattern_[0] != '(') Pattern_.insert(0, "(");
+            if (Pattern_[Pattern_.size() - 1] != ')') Pattern_.append(")");
+
+            size_t p_len = Pattern_.size();
+            NFAdg_.SetVertex(p_len +1);
+
+            stack<int> ops;
+            for (int i = 0; i<p_len; i++)
+            {
+                int lp_id = i;
+                if (Pattern_[i] == '(' || Pattern_[i] == '|') ops.push(i);
+                else if (Pattern_[i] == ')')
+                {
+                    int or_id = ops.top();
+                    ops.pop();
+                    if (Pattern_[or_id] == '|')
+                    {
+                        // lp->(....|<-or...)<-i
+                        lp_id = ops.top();
+                        ops.pop();
+                        NFAdg_.AddEdge(lp_id, or_id + 1);
+                        NFAdg_.AddEdge(or_id, i);
+                    }
+                    else lp_id = or_id;
+                }
+                // two cases: lp->(...)*<-i+1  or  a* 
+                if (i<p_len -1 && Pattern_[i + 1] == '*')
+                {
+                    NFAdg_.AddEdge(lp_id, i + 1);
+                    NFAdg_.AddEdge(i + 1, lp_id);
+                }
+                if (Pattern_[i] == '*' || Pattern_[i] == '(' || Pattern_[i] == ')') 
+                    NFAdg_.AddEdge(i, i + 1);
+            }
+        }
+
+        bool Match(const string &str)
+        {
+            vector<int> candidates;
+            NFAdg_.DFS(0, candidates);
+            size_t p_len = Pattern_.size();
+
+            for (int i = 0; i<str.size(); i++)
+            {
+                vector<int> match;
+                for (int v : candidates)
+                {
+                    if (v < p_len && (Pattern_[v] == str[i] || Pattern_[v] == '.'))
+                        match.push_back(v + 1);
+                }
+
+                NFAdg_.ResetVisit();
+                candidates.clear();
+                for (auto v : match)
+                {
+                    NFAdg_.DFS(v, candidates);
+                }
+            }
+
+            for (int v : candidates) if (v == p_len) return true;
+            return false;
+        }
+
+    private:
+        NFAdg NFAdg_;
+        string Pattern_;
+    };
+
     bool isMatch(string s, string p)
     {
         if (p.size() == 0) return s.size() == 0;
 
-        if (p[0] != '(') p.insert(0, "(");
-        if (p[p.size() - 1] != ')') p.append(")");
-
-        int p_len = p.size();
-
-        // initialize pattern string
-        NFAdg e_dg(p_len + 1);
-        SetupNFAdg(p,e_dg);
-
-        vector<int> candidates;
-        e_dg.DFS(0,candidates);
-        
-        for (int i = 0; i<s.size(); i++)
-        {
-            vector<int> match;
-            for (int v : candidates)
-            {
-                if(v<p_len && (p[v] == s[i] || p[v] == '.')) 
-                    match.push_back(v + 1);
-            }
-
-            e_dg.ResetVisit();
-            candidates.clear();
-            for (auto v : match)
-            {
-                e_dg.DFS(v,candidates);
-            }
-        }
-
-        for (int v : candidates) if (v == p_len) return true;
-        return false;
-    }
-
-private:
-    void SetupNFAdg(const string &p, NFAdg &e_dg)
-    {
-        size_t p_len = p.size();
-        stack<int> ops;
-        for (int i = 0; i<p_len; i++)
-        {
-            int lp_id = i;
-            if (p[i] == '(' || p[i] == '|') ops.push(i);
-            else if (p[i] == ')')
-            {
-                int or_id = ops.top();
-                ops.pop();
-                if (p[or_id] == '|')
-                {
-                    // lp->(....|<-or...)<-i
-                    lp_id = ops.top();
-                    ops.pop();
-                    e_dg.AddEdge(lp_id, or_id + 1);
-                    e_dg.AddEdge(or_id, i);
-                }
-                else lp_id = or_id;
-            }
-            // two cases: lp->(...)*<-i+1  or  a* 
-            if (i<p_len - 1 && p[i + 1] == '*')
-            {
-                e_dg.AddEdge(lp_id, i + 1);
-                e_dg.AddEdge(i + 1, lp_id);
-            }
-            if (p[i] == '*' || p[i] == '(' || p[i] == ')') e_dg.AddEdge(i, i + 1);
-        }
+        RegExpNFA nfa(p);
+        return nfa.Match(s);
     }
 };
 
@@ -728,7 +754,6 @@ public:
 '*' Matches any sequence of characters (including the empty sequence).
 The matching should cover the entire input string (not partial).
 */
-
 class WildCardMatch
 {
 public:
@@ -764,7 +789,6 @@ public:
         return p_index == p.size();
     }
 };
-
 
 /*
 48. Rotate Image
@@ -1332,35 +1356,7 @@ public:
         return dist_matrix[size1][size2];
     }
 };
-/*
-  419. Battleships in a Board
- */
 
-class BattleshipsInBoard 
-{
-public:
-    int CountBS(vector<vector<char>>& board)
-    {
-        int count = 0;
-        for(int i=0;i<board.size();i++)
-        {
-            for(int j=0;j<board[i].size();j++)
-            {
-                if(board[i][j] != '.')
-                {
-                    if(i==0 || board[i-1][j] == '.')
-                    {
-                        if(j==0 || board[i][j-1] == '.')
-                        {
-                            count++;
-                        }
-                    }
-                }
-            }
-        }
-        return count;
-    }
-};
 /*
 138. Copy List with Random Pointer
 A linked list is given such that each node contains an additional random pointer 
@@ -1468,6 +1464,7 @@ class ExcelSheetColumnNumber
         return number;
     }
 };
+
 /*
 200. Number of Islands
 */
@@ -1528,6 +1525,35 @@ public:
             if (i < x_max - 1) processor(i + 1, j);
             if (j < y_max - 1) processor(i, j + 1);
         }
+    }
+};
+
+/*
+419. Battleships in a Board
+*/
+class BattleshipsInBoard
+{
+public:
+    int CountBS(vector<vector<char>>& board)
+    {
+        int count = 0;
+        for (int i = 0; i<board.size(); i++)
+        {
+            for (int j = 0; j<board[i].size(); j++)
+            {
+                if (board[i][j] != '.')
+                {
+                    if (i == 0 || board[i - 1][j] == '.')
+                    {
+                        if (j == 0 || board[i][j - 1] == '.')
+                        {
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+        return count;
     }
 };
 

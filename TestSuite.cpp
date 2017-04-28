@@ -391,9 +391,9 @@ static void TestUF()
 
 int main(int argc,char *argv[])
 {
-    LongestCommonPrefix sln;
-    vector<string> strs{"a","b"};
-    cout << sln.Solution(strs) << endl;
+    SimpleRegularExpression sln;
+    cout<<sln.isMatch("abc",".*bc")<<endl;
+
     ::getchar();
     
     return 0;
