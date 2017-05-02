@@ -389,10 +389,24 @@ static void TestUF()
     cout << uf.Connected(2, 3) << endl;
 }
 
+static void TestLinkedListCycle()
+{
+    ListNode *head = new ListNode(0);
+    ListNode *node1 = new ListNode(1);
+    head->next = node1;
+    ListNode *node2 = new ListNode(2);
+    node1->next = node2;
+    ListNode *node3 = new ListNode(3);
+    node2->next = node3;
+    node3->next = head;
+    LinkedListCycleII sln;
+    sln.detectCycle(head);
+}
+
+
 int main(int argc,char *argv[])
 {
-    SimpleRegularExpression sln;
-    cout<<sln.isMatch("abc",".*bc")<<endl;
+    TestLinkedListCycle();
 
     ::getchar();
     

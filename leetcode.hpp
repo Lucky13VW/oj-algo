@@ -749,6 +749,98 @@ public:
 };
 
 /*
+36. Valid Sudoku
+The Sudoku board could be partially filled, 
+where empty cells are filled with the character '.'.
+*/
+class ValidSudoku 
+{
+public:
+    bool IsValid(vector<vector<char>>& board) 
+    {
+        bool row[9][9] = { false };
+        bool col[9][9] = { false };
+        bool sub[9][9] = { false };
+
+        for (int i = 0; i<board.size(); i++)
+        {
+            for (int j = 0; j<board[i].size(); j++)
+            {
+                if (board[i][j] != '.')
+                {
+                    int num = board[i][j] - '0' - 1;
+                    int sub_id = i / 3 * 3 + j / 3;
+                    // check row
+                    if (row[i][num] ||
+                        col[j][num] ||
+                        sub[sub_id][num]) return false;
+                    else row[i][num] = col[j][num] = sub[sub_id][num] = true;
+                }
+            }
+        }
+        return true;
+
+    }
+};
+
+/*
+37. Sudoku Solver
+*/
+class SudokuSolver 
+{
+public:
+    void Solve(vector<vector<char>>& board)
+    {
+        Helper(board);
+    }
+
+private:
+    bool Helper(vector<vector<char>>& board)
+    {
+        for (int i = 0; i<board.size(); i++)
+        {
+            for (int j = 0; j<board[i].size(); j++)
+            {
+                if (board[i][j] == '.')
+                {
+                    for (int k = 0; k<9; k++)
+                    {
+                        char c = '1' + k;
+                        if (IsValid(board, c, i, j))
+                        {
+                            board[i][j] = c;
+                            // try this solution
+                            if (Helper(board))
+                                return true;
+                            else
+                                board[i][j] = '.'; // backtracking   
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool IsValid(vector<vector<char>>& board, char c, int i, int j)
+    {
+        for (int k = 0; k<board[i].size(); k++)
+        {
+            // check row
+            if (board[i][k] == c) return false;
+            // check column
+            if (board[k][j] == c) return false;
+            // check sub-box
+            int sub_r = i / 3 * 3 + k / 3; // 000111...
+            int sub_c = j / 3 * 3 + k % 3; // 012012...
+            if (board[sub_r][sub_c] == c) return false;
+        }
+        return true;
+    }
+};
+
+/*
 44. Wildcard Matching
 '?' Matches any single character.
 '*' Matches any sequence of characters (including the empty sequence).
@@ -1415,6 +1507,66 @@ public:
 };
 
 /*
+141. Linked List Cycle
+Given a linked list, determine if it has a cycle in it.
+*/
+class LinkedListCycle 
+{
+public:
+    bool hasCycle(ListNode *head) 
+    {
+        if (head == NULL) return false;
+
+        ListNode *slow = head;
+        ListNode *fast = head;
+
+        while (fast != NULL && fast->next != NULL)
+        {
+            slow = slow->next; // move 1 step
+            fast = fast->next->next; // move 2 steps
+            if (fast == slow) return true;
+        }
+        return false;
+    }
+};
+
+/*
+142. Linked List Cycle II
+*/
+class LinkedListCycleII 
+{
+public:
+    ListNode *detectCycle(ListNode *head)
+    {
+        if (head == NULL) return NULL;
+
+        ListNode *slow = head;
+        ListNode *fast = head;
+        // find the meeting point
+        ListNode *meet = NULL;
+        while (fast != NULL && fast->next != NULL)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+            if (fast == slow)
+            {
+                meet = fast;
+                break;
+            }
+        }
+        if (meet == NULL) return NULL;
+
+        slow = head;
+        while (slow != fast)
+        {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return slow;
+    }
+};
+
+/*
 165 Compare Version Numbers
 If version1 > version2 return 1, if version1 < version2 return -1, otherwise return 0.
 0.1 < 1.1 < 1.2 < 13.37
@@ -1462,6 +1614,24 @@ class ExcelSheetColumnNumber
             number = number * 26 + n_digit;
         }
         return number;
+    }
+};
+
+/*
+191. Number of 1 Bits
+*/
+class NumberOfBits 
+{
+public:
+    int hammingWeight(uint32_t n) 
+    {
+        int i = 0;
+        while (n>0)
+        {
+            i++;
+            n &= (n - 1);
+        }
+        return i;
     }
 };
 
