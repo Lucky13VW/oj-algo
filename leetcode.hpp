@@ -1754,6 +1754,46 @@ public:
 };
 
 /*
+232. Implement Queue using Stacks
+*/
+class MyQueueByStack 
+{
+public:
+    MyQueueByStack() = default;
+    ~MyQueueByStack() = default;
+
+    void push(int x) {
+        stack<int> temp;
+        // reverse data
+        while (!Data_.empty())
+        {
+            temp.push(Data_.top());
+            Data_.pop();
+        }
+        // push back 
+        Data_.push(x);
+        while (!temp.empty())
+        {
+            Data_.push(temp.top());
+            temp.pop();
+        }
+    }
+
+    int pop() {
+        int ret = 0;
+        ret = Data_.top();
+        Data_.pop();
+        return ret;
+    }
+
+    int peek() { return Data_.top();}
+    bool empty() { return Data_.empty();}
+
+private:
+    stack<int> Data_;
+};
+
+/*
 237. Delete Node in a Linked List
 */
 class DeleteNodeInLinkedList
@@ -1771,6 +1811,35 @@ public:
         }
         prev->next = NULL;
         delete node;
+    }
+};
+
+/*
+258. Add Digits
+Given a non-negative integer num, repeatedly add all its digits until the result has only one digit.
+e.g:
+Given num = 38, the process is like: 3 + 8 = 11, 1 + 1 = 2. Since 2 has only one digit, return it.
+*/
+class AddDigits 
+{
+public:
+    int add(int num) 
+    {
+
+        while (num>9)
+        {
+            num = num / 10 + num % 10;
+        }
+        return num;
+    }
+
+    // digit of number added == number%9
+    int add2(int num) {
+
+        int res = num % 9;
+        if (res == 0 && num != 0) res = 9;
+
+        return res;
     }
 };
 
