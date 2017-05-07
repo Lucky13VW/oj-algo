@@ -76,16 +76,10 @@ Add the two numbers and return it as a linked list.
 Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
 Output: 7 -> 0 -> 8
 */
-class AddTwoNumbersSolution {
-
-   struct ListNode {
-      int val;
-      ListNode *next;
-      ListNode(int x) : val(x), next(NULL) {}
-  }; 
-
+class AddTwoNumbers 
+{
 public:
-    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) 
+    ListNode* add(ListNode* l1, ListNode* l2) 
     {
         ListNode *result = NULL, *prev = NULL;
 
@@ -127,6 +121,67 @@ public:
             prev->next = new ListNode(carry);
         }
         return result;
+    }
+};
+
+/*
+445. Add Two Numbers II
+You are given two non-empty linked lists representing two non-negative integers. 
+The most significant digit comes first and each of their nodes contain a single digit. 
+Add the two numbers and return it as a linked list.
+
+Input: (7 -> 2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 8 -> 0 -> 7
+*/
+class AddTwoNumbersII {
+public:
+    ListNode* Add(ListNode* l1, ListNode* l2)
+    {
+        if (l1 == NULL && l2 == NULL) return NULL;
+
+        stack<int> l1_num, l2_num;
+        while (l1)
+        {
+            l1_num.push(l1->val);
+            l1 = l1->next;
+        }
+        while (l2)
+        {
+            l2_num.push(l2->val);
+            l2 = l2->next;
+        }
+        ListNode *node = NULL, *prev = NULL;
+
+        int carry = 0;
+        while (!l1_num.empty() || !l2_num.empty())
+        {
+            int num1 = 0, num2 = 0;
+            if (!l1_num.empty())
+            {
+                num1 = l1_num.top();
+                l1_num.pop();
+            }
+            if (!l2_num.empty())
+            {
+                num2 = l2_num.top();
+                l2_num.pop();
+            }
+
+            int sum = num1 + num2 + carry;
+            carry = sum / 10;
+            sum = sum % 10;
+
+            prev = node;
+            node = new ListNode(sum);
+            node->next = prev;
+        }
+        if (carry>0)
+        {
+            prev = node;
+            node = new ListNode(carry);
+            node->next = prev;
+        }
+        return node;
     }
 };
 
@@ -1525,6 +1580,27 @@ public:
             if (i < x_max - 1) processor(i + 1, j);
             if (j < y_max - 1) processor(i, j + 1);
         }
+    }
+};
+
+/*
+237. Delete Node in a Linked List
+*/
+class DeleteNodeInLinkedList
+{
+public:
+    void deleteNode(ListNode* node)
+    {
+        if (node == NULL) return;
+        ListNode *prev = node;
+        while (node && node->next)
+        {
+            node->val = node->next->val;
+            prev = node;
+            node = node->next;
+        }
+        prev->next = NULL;
+        delete node;
     }
 };
 

@@ -441,4 +441,82 @@ private:
     }
 };
 
+/*
+472. Concatenated Words
+
+Given a list of words (without duplicates), please write a program that returns all concatenated words in the given list of words.
+A concatenated word is defined as a string that is comprised entirely of at least two shorter words in the given array.
+
+Input: ["cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"]
+Output: ["catsdogcats","dogcatsdog","ratcatdogcat"]
+*/
+
+// Memory Limit Exceeded!!!
+class AllConcatenatedWordsInADict
+{
+    class Trie
+    {
+#define SET_SIZE 26
+        struct Node
+        {
+            vector<Node*> CharSet;
+            bool  IsWord;
+            Node() :CharSet(SET_SIZE, nullptr), IsWord(false) {}
+        };
+
+    public:
+        Trie() :Root_(new Node()) {}
+        ~Trie() = default;
+
+        void AddWord(const string &str)
+        {
+            Node *curr = Root_;
+            for (char c : str)
+            {
+                if (curr->CharSet[c - 'a'] == nullptr)
+                    curr->CharSet[c - 'a'] = new Node;
+                curr = curr->CharSet[c - 'a'];
+            }
+            curr->IsWord = true;
+        }
+
+        bool CountWord(const string &str, int start, int count)
+        {
+            Node *curr = Root_;
+            for (int i = start; i<str.size(); i++)
+            {
+                curr = curr->CharSet[str[i] - 'a'];
+                if (curr == nullptr) return false;
+                if (curr->IsWord)
+                {
+                    // last char
+                    if (i == str.size() - 1) return count>0;
+                    if (CountWord(str, i + 1, count + 1)) return true;
+                }
+            }
+            return false;
+        }
+
+    private:
+        Node *Root_;
+    };
+
+public:
+    vector<string> Find(vector<string>& words)
+    {
+        vector<string> result;
+        Trie pre_tree;
+        for (auto &str : words)
+            if (str.size()>0) pre_tree.AddWord(str);
+
+        for (auto &str : words)
+        {
+            if (str.size() == 0) continue;
+
+            if (pre_tree.CountWord(str, 0, 0)) result.push_back(str);
+        }
+        return result;
+    }
+};
+
 #endif

@@ -391,8 +391,10 @@ static void TestUF()
 
 int main(int argc,char *argv[])
 {
-    SimpleRegularExpression sln;
-    cout<<sln.isMatch("abc",".*bc")<<endl;
+    AllConcatenatedWordsInADict sln;
+    vector<string> str{ "a","aa","aaa","aaaa","aaaaa","aaaaaa","aaaaaaa","aaaaaaaa"};
+    vector<string> result = sln.Find(str);
+    for (auto &sub : result) cout << sub << " ";
 
     ::getchar();
     

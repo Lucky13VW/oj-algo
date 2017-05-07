@@ -24,8 +24,8 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 73 Set Matrix Zeroes 35.1% Medium 
 * 121 Best Time to Buy and Sell Stock 39.1% Easy 
 141 Linked List Cycle 35.8% Easy 
-237 Delete Node in a Linked List 45.4% Easy 
-445 Add Two Numbers II 46.2% Medium 
+* 237 Delete Node in a Linked List 45.4% Easy 
+* 445 Add Two Numbers II 46.2% Medium 
 117 Populating Next Right Pointers in Each Node II 33.5% Hard 
 168 Excel Sheet Column Title 24.4% Easy 
 * 2 Add Two Numbers 26.2% Medium 
