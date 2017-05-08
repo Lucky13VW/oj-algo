@@ -1689,6 +1689,13 @@ public:
 
 /*
 171. Excel Sheet Column Number
+Given a column title as appear in an Excel sheet, 
+return its corresponding column number.
+A -> 1
+...
+Z -> 26
+AA -> 27
+AB -> 28
 */
 class ExcelSheetColumnNumber
 {
