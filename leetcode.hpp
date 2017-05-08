@@ -703,7 +703,7 @@ public:
 Merge two sorted linked lists and return it as a new list. 
 The new list should be made by splicing together the nodes of the first two lists.
 */
-class Solution
+class MergeTwoSortedLists
 {
 public:
     ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
@@ -736,6 +736,39 @@ public:
             else { prev->next = node; prev = node; }
         }
         return result;
+    }
+};
+
+/*
+24. Swap Nodes in Pairs
+Given a linked list, swap every two adjacent nodes and return its head.
+e.g:
+Given 1->2->3->4, you should return the list as 2->1->4->3.
+You may not modify the values in the list, only nodes itself can be changed.
+*/
+class SwapNodesInPairs {
+public:
+    ListNode* swapPairs(ListNode* head)
+    {
+        if (head == NULL) return NULL;
+
+        ListNode *prev = NULL, *curr = head, *next = curr->next;
+        while (next != NULL)
+        {
+            ListNode *temp = next->next;
+            next->next = curr;
+            curr->next = temp;
+            if (prev != NULL) prev->next = next;
+            else head = next;
+
+            // next already swapped with curr
+            prev = curr;
+            curr = curr->next;
+            if (curr == NULL) break;
+            next = curr->next;
+        }
+
+        return head;
     }
 };
 

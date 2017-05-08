@@ -34,13 +34,13 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 174 Dungeon Game 22.8% Hard 
 * 20 Valid Parentheses 32.1% Easy 
 * 98 Validate Binary Search Tree 22.3% Medium 
-13 Roman to Integer 43.4% Easy 
+* 13 Roman to Integer 43.4% Easy 
 146 LRU Cache 16.0% Hard 
 * 208 Implement Trie (Prefix Tree) 25.6% Medium 
 33 Search in Rotated Sorted Array 31.9% Hard 
 212 Word Search II 22.2% Hard 
 153 Find Minimum in Rotated Sorted Array 38.6% Medium 
-24 Swap Nodes in Pairs 37.1% Easy 
+* 24 Swap Nodes in Pairs 37.1% Easy 
 * 191 Number of 1 Bits 38.5% Easy 
 160 Intersection of Two Linked Lists 30.0% Easy 
 215 Kth Largest Element in an Array 37.4% Medium 
@@ -66,7 +66,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 91 Decode Ways 18.8% Medium 
 * 94 Binary Tree Inorder Traversal 43.7% 		Medium 
 * 165 Compare Version Numbers 19.2% Easy 
-28 Implement strStr() 26.9% Easy 
+* 28 Implement strStr() 26.9% Easy 
 101 Symmetric Tree 36.9% Easy 
 162 Find Peak Element 35.8% Medium 
 * 125 Valid Palindrome 25.3% Easy 
