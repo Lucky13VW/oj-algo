@@ -18,12 +18,112 @@ struct TreeNode
 
 /*
 94, Binary Tree Inorder Traversal
+Recursive solution is trivial, could you do it iteratively
+
 Inorder(Node*root)
-if root == null return;
-InOrder(root->left);
-visit(root);
-Inorder(root->right);
+    if root == null return;
+    InOrder(root->left);
+    visit(root);
+    Inorder(root->right);
 */
+class BinaryTreeInorderTraversal 
+{
+public:
+    vector<int> inorderTraversal(TreeNode* root) 
+    {
+        vector<int> result;
+        stack<TreeNode*> visit;
+        while (root != NULL || !visit.empty())
+        {
+            while (root != NULL)
+            {
+                visit.push(root);
+                root = root->left;
+            }
+
+            if (!visit.empty())
+            {
+                root = visit.top();
+                result.push_back(root->val);
+                visit.pop();
+                root = root->right;
+            }
+        }
+        return result;
+    }
+};
+
+/*
+144 Binary Tree Preorder Traversal
+Recursive solution is trivial, do it iteratively.
+*/
+class BinaryTreePreorderTraversal
+{
+public:
+    vector<int> preorderTraversal(TreeNode* root)
+    {
+        vector<int> result;
+        stack<TreeNode*> visit;
+        while (root != NULL || !visit.empty())
+        {
+            while (root != NULL)
+            {
+                result.push_back(root->val);
+                visit.push(root);
+                root = root->left;
+            }
+            if (!visit.empty())
+            {
+                root = visit.top();
+                visit.pop();
+                root = root->right;
+            }
+        }
+        return result;
+    }
+};
+
+/*
+145. Binary Tree Postorder Traversal
+Recursive solution is trivial, could you do it iteratively?
+*/
+class BinaryTreePostorderTraversal 
+{
+public:
+    vector<int> postorderTraversal(TreeNode* root) 
+    {
+        vector<int> result;
+        stack<TreeNode*> visit;
+        TreeNode *pre_node = NULL;
+        while (root != NULL || !visit.empty())
+        {
+            while (root != NULL)
+            {
+                visit.push(root);
+                root = root->left;
+            }
+
+            if (!visit.empty())
+            {
+                root = visit.top();
+                // pre_node == root->right means
+                // traversal just returns from right child
+                if (root->right != NULL && pre_node != root->right)
+                {
+                    root = root->right;
+                }
+                else 
+                {
+                    result.push_back(root->val);
+                    pre_node = root;
+                    root = NULL;
+                    visit.pop();
+                }
+            }
+        }
+        return result;
+    }
+};
 
 /*
 98. Validate Binary Search Tree
@@ -65,6 +165,7 @@ public:
 
 /*
 102. Binary Tree Level Order Traversal
+107. Binary Tree Level Order Traversal II
 103. Binary Tree Zigzag Level Order Traversal
 Given a binary tree, return the zigzag level order traversal of its nodes' values.
 (ie, from left to right, then right to left for the next level and alternate between).
@@ -107,6 +208,31 @@ public:
             }
             result.push_back(depth_node);
         }
+        return result;
+    }
+
+    vector<vector<int>> LevelOrderBottom(TreeNode* root)
+    {
+        vector<vector<int>> result;
+        if (root == NULL) return result;
+
+        queue<TreeNode*> visit;
+        visit.push(root);
+        while (!visit.empty())
+        {
+            int level_count = visit.size();
+            vector<int> same_level;
+            for (int i = 0; i<level_count; i++)
+            {
+                root = visit.front();
+                same_level.push_back(root->val);
+                if (root->left != NULL) visit.push(root->left);
+                if (root->right != NULL) visit.push(root->right);
+                visit.pop();
+            }
+            result.push_back(same_level);
+        }
+        reverse(result.begin(), result.end());
         return result;
     }
 
@@ -388,7 +514,6 @@ private:
 /*
 297. Serialize and Deserialize Binary Tree
 */
-
 class BinaryTreeCodec
 {
     const char DELI = '|';
