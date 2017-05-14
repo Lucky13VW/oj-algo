@@ -27,7 +27,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 445 Add Two Numbers II 46.2% Medium 
 * 141 Linked List Cycle 35.8% Easy 
 117 Populating Next Right Pointers in Each Node II 33.5% Hard 
-168 Excel Sheet Column Title 24.4% Easy 
+* 168 Excel Sheet Column Title 24.4% Easy 
 * 2 Add Two Numbers 26.2% Medium 
 * 21 Merge Two Sorted Lists 37.9% Easy 
 * 8 String to Integer (atoi) 13.8% Easy 
@@ -58,7 +58,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 5 Longest Palindromic Substring 24.5%	 	Medium 
 * 285 Inorder Successor in BST 36.2% Medium 
 25 Reverse Nodes in k-Group 29.7% Hard 
-270 Closest Binary Search Tree Value 38.0% Easy 
+$ 270 Closest Binary Search Tree Value 38.0% Easy 
 23 Merge k Sorted Lists 25.9% Hard 
 * 258 Add Digits 50.2% Easy 
 79 Word Search 25.3% Medium 
@@ -67,7 +67,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 94 Binary Tree Inorder Traversal 43.7% 		Medium 
 * 165 Compare Version Numbers 19.2% Easy 
 * 28 Implement strStr() 26.9% Easy 
-101 Symmetric Tree 36.9% Easy 
+* 101 Symmetric Tree 36.9% Easy 
 162 Find Peak Element 35.8% Medium 
 * 125 Valid Palindrome 25.3% Easy 
 112 Path Sum 32.9% Easy 

@@ -164,6 +164,83 @@ public:
 };
 
 /*
+100. Same Tree
+Given two binary trees, write a function to check if they are equal or not.
+Two binary trees are considered equal if they are structurally identical 
+and the nodes have the same value.
+*/
+class SameBinaryTree 
+{
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if (p == NULL || q == NULL) return p == q;
+
+        return (p->val == q->val && 
+            isSameTree(p->left, q->left) && 
+            isSameTree(p->right, q->right));
+    }
+};
+
+/*
+101. Symmetric Tree
+Given a binary tree, check whether it is a mirror of itself.
+For example, this binary tree [1,2,2,3,4,4,3] is symmetric:
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+Bonus points if you could solve it both recursively and iteratively.
+*/
+class SymmetricBinaryTree 
+{
+public:
+    bool isSymmetricRec(TreeNode* root) 
+    {
+        if (root == NULL) return true;
+
+        return isMirror(root->left, root->right);
+    }
+
+    bool isSymmetricIte(TreeNode* root) {
+        if (root == NULL) return true;
+
+        queue<TreeNode*> visit;
+        visit.push(root->left);
+        visit.push(root->right);
+
+        while (!visit.empty())
+        {
+            TreeNode *p = visit.front();
+            visit.pop();
+            TreeNode *q = visit.front();
+            visit.pop();
+            if (p == NULL || q == NULL)
+            {
+                if (p == q) continue;
+                else return false;
+            }
+            if (p->val != q->val) return false;
+            visit.push(p->left);
+            visit.push(q->right);
+            visit.push(p->right);
+            visit.push(q->left);
+        }
+        return true;
+    }
+
+private:
+    bool isMirror(TreeNode *p, TreeNode *q)
+    {
+        if (p == NULL || q == NULL) return p == q;
+
+        return (p->val == q->val &&
+            isMirror(p->left, q->right) &&
+            isMirror(p->right, q->left));
+    }
+};
+
+/*
 102. Binary Tree Level Order Traversal
 107. Binary Tree Level Order Traversal II
 103. Binary Tree Zigzag Level Order Traversal
