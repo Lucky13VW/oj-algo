@@ -42,15 +42,15 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 153 Find Minimum in Rotated Sorted Array 38.6% Medium 
 * 24 Swap Nodes in Pairs 37.1% Easy 
 * 191 Number of 1 Bits 38.5% Easy 
-160 Intersection of Two Linked Lists 30.0% Easy 
+* 160 Intersection of Two Linked Lists 30.0% Easy 
 215 Kth Largest Element in an Array 37.4% Medium 
-26 Remove Duplicates from Sorted Array 35.3% Easy 
+* 26 Remove Duplicates from Sorted Array 35.3% Easy 
 * 4 Median of Two Sorted Arrays 20.8% Hard 
 * 232 Implement Queue using Stacks 34.9% Easy 
 * 102 Binary Tree Level Order Traversal 36.9% Easy 
-189 Rotate Array 23.5% Easy 
+* 189 Rotate Array 23.5% Easy 
 71 Simplify Path 24.0% Medium 
-387 First Unique Character in a String 45.3% Easy 
+* 387 First Unique Character in a String 45.3% Easy 
 * 106 Construct Binary Tree from Inorder and Postorder Traversal 30.9% Medium 
 * 204 Count Primes 26.1% Easy 
 * 173 Binary Search Tree Iterator 38.9% Medium 
@@ -70,11 +70,11 @@ $ 270 Closest Binary Search Tree Value 38.0% Easy
 * 101 Symmetric Tree 36.9% Easy 
 162 Find Peak Element 35.8% Medium 
 * 125 Valid Palindrome 25.3% Easy 
-112 Path Sum 32.9% Easy 
+* 112 Path Sum 32.9% Easy 
 124 Binary Tree Maximum Path Sum 25.0% Hard 
 56 Merge Intervals 28.3% Hard 
 365 Water and Jug Problem 26.0% Medium 
-55 	Jump Game 29.2% 		Medium 
+* 55 Jump Game 29.2% Medium 
 300 Longest Increasing Subsequence 37.3% Medium 
 114 Flatten Binary Tree to Linked List 33.5% Medium 
 * 47 Permutations II 30.9% Medium 

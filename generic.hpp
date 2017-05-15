@@ -350,7 +350,6 @@ private:
         merge(arr,low,mid,high);
     }
 
-
     void merge(vector<type> &arr, int low, int mid, int high)
     {
         int i = low, j = mid + 1;

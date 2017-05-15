@@ -773,6 +773,36 @@ public:
 };
 
 /*
+26. Remove Duplicates from Sorted Array
+Given a sorted array, remove the duplicates in place 
+such that each element appear only once and return the new length.
+Do not allocate extra space for another array, you must do this in place with constant memory.
+
+For example,
+Given input array nums = [1,1,2],
+Your function should return length = 2, with the first two elements of nums being 1 and 2 respectively.
+*/
+class RemoveDuplicatesFromSortedArray
+{
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.size() == 0) return 0;
+
+        int prev = nums[0];
+        for (auto it = nums.begin() + 1; it != nums.end();)
+        {
+            if (*it != prev)
+            {
+                prev = *it;
+                it++;
+            }
+            else nums.erase(it);
+        }
+        return nums.size();
+    }
+};
+
+/*
 28. Implement strStr()
 Returns the index of the first occurrence of needle in haystack or -1(not found).
 */
@@ -1655,6 +1685,49 @@ public:
 };
 
 /*
+160. Intersection of Two Linked Lists
+*/
+class IntersectionTwoLinkedLists 
+{
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        int lenA = 0, lenB = 0;
+        ListNode *currA = headA, *currB = headB;
+        while (currA != NULL) { lenA++; currA = currA->next; }
+        while (currB != NULL) { lenB++; currB = currB->next; }
+
+        if (lenA>lenB)
+            for (int i = 0; i<lenA - lenB; i++) headA = headA->next;
+        if (lenB>lenA)
+            for (int i = 0; i<lenB - lenA; i++) headB = headB->next;
+
+        while (headA != NULL && headB != NULL)
+        {
+            if (headA == headB) return headA;
+            else { headA = headA->next; headB = headB->next; }
+        }
+        return NULL;
+    }
+
+    // If one of them reaches the end earlier then reuse it 
+    // by moving it to the beginning of other list.
+    // Once both of them go through reassigning, 
+    // they will be equidistant from the collision point.
+    ListNode *getIntersectionNodeV2(ListNode *headA, ListNode *headB)
+    {
+        if (headA == NULL || headB == NULL) return NULL;
+
+        ListNode *pA = headA, *pB = headB;
+        while (pA != pB)
+        {
+            pA = pA == NULL ? headB : pA->next;
+            pB = pB == NULL ? headA : pB->next;
+        }
+        return pA;
+    }
+};
+
+/*
 165 Compare Version Numbers
 If version1 > version2 return 1, if version1 < version2 return -1, otherwise return 0.
 0.1 < 1.1 < 1.2 < 13.37
@@ -1736,6 +1809,38 @@ class ExcelSheetColumnNumber
             number = number * 26 + n_digit;
         }
         return number;
+    }
+};
+
+/*
+189. Rotate Array
+Rotate an array of n elements to the right by k steps.
+
+For example, with n = 7 and k = 3, 
+the array [1,2,3,4,5,6,7] is rotated to [5,6,7,1,2,3,4].
+*/
+class RotateArray 
+{
+public:
+    void rotate(vector<int>& nums, int k) {
+        int n = nums.size();
+        if (n == 0) return;
+        k %= n; // k maybe bigger than n
+        if (k == 0) return;
+        reverse(nums, 0, n - k - 1);
+        reverse(nums, n - k, n - 1);
+        reverse(nums, 0, n - 1);
+    }
+
+private:
+    void reverse(vector<int> &nums, int start, int end)
+    {
+        while (start<end)
+        {
+            swap(nums[start], nums[end]);
+            start++;
+            end--;
+        }
     }
 };
 
@@ -1907,6 +2012,28 @@ public:
         if (res == 0 && num != 0) res = 9;
 
         return res;
+    }
+};
+
+/*
+387. First Unique Character in a String
+Given a string, find the first non-repeating character in it and return it's index.
+If it doesn't exist, return -1.
+
+Examples:
+s = "leetcode"
+return 0.
+*/
+class FirstUniqueCharacter {
+public:
+    int firstUniqChar(string s) {
+        vector<int> counter(256, 0);
+        for (char c : s) counter[c]++;
+        for (int i = 0; i<s.size(); i++)
+        {
+            if (counter[s[i]] == 1) return i;
+        }
+        return -1;
     }
 };
 
