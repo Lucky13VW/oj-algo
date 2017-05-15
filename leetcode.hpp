@@ -796,7 +796,7 @@ public:
                 prev = *it;
                 it++;
             }
-            else nums.erase(it);
+            else it = nums.erase(it);
         }
         return nums.size();
     }
