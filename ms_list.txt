@@ -59,7 +59,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 285 Inorder Successor in BST 36.2% Medium 
 25 Reverse Nodes in k-Group 29.7% Hard 
 $ 270 Closest Binary Search Tree Value 38.0% Easy 
-23 Merge k Sorted Lists 25.9% Hard 
+* 23 Merge k Sorted Lists 25.9% Hard 
 * 258 Add Digits 50.2% Easy 
 79 Word Search 25.3% Medium 
 * 46 Permutations 40.3% Medium 
@@ -75,7 +75,7 @@ $ 270 Closest Binary Search Tree Value 38.0% Easy
 56 Merge Intervals 28.3% Hard 
 365 Water and Jug Problem 26.0% Medium 
 * 55 Jump Game 29.2% Medium 
-300 Longest Increasing Subsequence 37.3% Medium 
+* 300 Longest Increasing Subsequence 37.3% Medium 
 114 Flatten Binary Tree to Linked List 33.5% Medium 
 * 47 Permutations II 30.9% Medium 
 213 House Robber II 33.0% Medium 

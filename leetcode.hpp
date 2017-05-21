@@ -14,6 +14,21 @@
 
 using namespace std;
 
+struct ListNode
+{
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
+struct TreeNode
+{
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
 /*
 1. Two Sum
 Given nums = [2, 7, 11, 15], target = 9,
@@ -66,159 +81,6 @@ public:
     }
 };
 
-
-/*
-2. Add Two Numbers
-You are given two linked lists representing two non-negative numbers. 
-The digits are stored in reverse order and each of their nodes contain a single digit. 
-Add the two numbers and return it as a linked list.
-
-Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
-Output: 7 -> 0 -> 8
-*/
-class AddTwoNumbers 
-{
-public:
-    ListNode* add(ListNode* l1, ListNode* l2) 
-    {
-        ListNode *result = NULL, *prev = NULL;
-
-        int carry = 0;
-        while (l1 != NULL || l2 != NULL)
-        {
-            int sum = carry;
-            if (l1 == NULL)
-            {
-                sum += l2->val;
-                l2 = l2->next;
-            }
-            else if (l2 == NULL)
-            {
-                sum += l1->val;
-                l1 = l1->next;
-            }
-            else
-            {
-                sum += (l1->val + l2->val);
-                l1 = l1->next;
-                l2 = l2->next;
-            }
-
-            if (sum >= 10)
-            {
-                carry = 1;
-                sum -= 10;
-            }
-            else carry = 0;
-
-            ListNode *node = new ListNode(sum);
-            if (prev == NULL) result = prev = node;
-            else prev->next = node;
-            prev = node;
-        }
-        if (carry == 1)
-        {
-            prev->next = new ListNode(carry);
-        }
-        return result;
-    }
-};
-
-/*
-445. Add Two Numbers II
-You are given two non-empty linked lists representing two non-negative integers. 
-The most significant digit comes first and each of their nodes contain a single digit. 
-Add the two numbers and return it as a linked list.
-
-Input: (7 -> 2 -> 4 -> 3) + (5 -> 6 -> 4)
-Output: 7 -> 8 -> 0 -> 7
-*/
-class AddTwoNumbersII {
-public:
-    ListNode* Add(ListNode* l1, ListNode* l2)
-    {
-        if (l1 == NULL && l2 == NULL) return NULL;
-
-        stack<int> l1_num, l2_num;
-        while (l1)
-        {
-            l1_num.push(l1->val);
-            l1 = l1->next;
-        }
-        while (l2)
-        {
-            l2_num.push(l2->val);
-            l2 = l2->next;
-        }
-        ListNode *node = NULL, *prev = NULL;
-
-        int carry = 0;
-        while (!l1_num.empty() || !l2_num.empty())
-        {
-            int num1 = 0, num2 = 0;
-            if (!l1_num.empty())
-            {
-                num1 = l1_num.top();
-                l1_num.pop();
-            }
-            if (!l2_num.empty())
-            {
-                num2 = l2_num.top();
-                l2_num.pop();
-            }
-
-            int sum = num1 + num2 + carry;
-            carry = sum / 10;
-            sum = sum % 10;
-
-            prev = node;
-            node = new ListNode(sum);
-            node->next = prev;
-        }
-        if (carry>0)
-        {
-            prev = node;
-            node = new ListNode(carry);
-            node->next = prev;
-        }
-        return node;
-    }
-};
-
-// 3. Longest Substring Without Repeating Characters
-class LongestSubstringWithoutRepeating {
-public:
-    int LengthOfSubstring(string s)
-    {
-        if (s.size() == 0) return 0;
-
-        map<char, int> char_set;
-        char_set.insert(pair<char, int>(s.at(0), 0));
-        // greedy algo?
-        int index = 1, max_len = 1, result = 1;
-        while (index<s.size())
-        {
-            char curr = s.at(index);
-            auto it = char_set.find(curr);
-            if (it == char_set.end())
-            {
-                char_set[curr] = index;
-                if (++max_len>result)
-                    result = max_len;
-
-                index++;
-            }
-            else
-            {
-                max_len = 0;
-                index = it->second + 1;
-                char_set.clear();
-            }
-        }
-        return result;
-    }
-};
-
 /*
 4. Median of Two Sorted Arrays
 Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
@@ -253,40 +115,6 @@ public:
 
         return is_even ? (mid + mid_pre) / 2.0 : mid;
     }
-};
-
-// 5. Longest Palindromic Substring 
-class LongestPalindrome
-{
-public:
-    string BrutalWay(string s)
-    {
-        if (s.size()<2) return s;
-        int max_start = 0, max_len = 0;
-        for (int i = 1; i<s.size(); i++)
-        {
-            function<void(int, int)> check_functor = [&](int start, int end)
-            {
-                while (start >= 0 && end<s.size() && s.at(start) == s.at(end))
-                {
-                    start--;
-                    end++;
-                }
-                if (end - start - 1>max_len)
-                {
-                    max_len = end - start - 1;
-                    max_start = start + 1;
-                }
-            };
-            // check for odd
-            check_functor(i - 1, i + 1);
-            // check for even
-            check_functor(i - 1, i);
-        }
-
-        return s.substr(max_start, max_len);
-    }
-
 };
 
 /*
@@ -369,169 +197,6 @@ public:
 };
 
 /*
-10. Regular Expression Matching
-'.' Matches any single character.
-'*' Matches zero or more of the preceding element.
-The matching should cover the entire input string (not partial).
-isMatch("ab", ".*") ¡ú true
-isMatch("aab", "c*a*b") ¡ú true
-*/
-
-// not correct
-class SimpleRegularExpression
-{
-public:
-    class NFAdg
-    {
-        enum color
-        {
-            white = 0,
-            gray = 1,
-            black = 2
-        };
-    public:
-        NFAdg(size_t size)
-        {
-            SetVertex(size);
-        }
-        NFAdg() = default;
-        ~NFAdg() = default;
-
-        void SetVertex(size_t size)
-        {
-            for (int i = 0; i<size; i++)
-            {
-                States_.push_back(set<int>());
-            }
-
-            int prev_marked_size = Marked_.size();
-            Marked_.resize(size, white);
-            if (prev_marked_size > 0) ResetVisit();
-        }
-
-        void AddEdge(int i, int j)
-        {
-            States_[i].insert(j);    
-        }
-
-        void RemoveEdge(int i, int j)
-        {
-            States_[i].erase(j);
-        }
-
-        void ResetVisit()
-        {
-            for (int i = 0; i < Marked_.size(); i++)
-                Marked_[i] = white;
-        }
-
-        void DFS(int i,vector<int> &visit)
-        {
-            if (Marked_[i] == white)
-            {
-                Marked_[i] = gray;
-                visit.push_back(i);
-                for (auto adj : States_[i]) DFS(adj,visit);
-                Marked_[i] = black;
-            }
-        }
-
-    private:
-        vector<set<int>> States_;
-        vector<color> Marked_;
-    };
-
-    class RegExpNFA
-    {
-    public:
-        RegExpNFA() = default;
-        ~RegExpNFA() = default;
-
-        RegExpNFA(const string &pat) { SetPattern(pat); }
-
-        void SetPattern(const string &pattern)
-        {
-            if (pattern.size() == 0) return;
-
-            Pattern_ = pattern;
-            if (Pattern_[0] != '(') Pattern_.insert(0, "(");
-            if (Pattern_[Pattern_.size() - 1] != ')') Pattern_.append(")");
-
-            size_t p_len = Pattern_.size();
-            NFAdg_.SetVertex(p_len +1);
-
-            stack<int> ops;
-            for (int i = 0; i<p_len; i++)
-            {
-                int lp_id = i;
-                if (Pattern_[i] == '(' || Pattern_[i] == '|') ops.push(i);
-                else if (Pattern_[i] == ')')
-                {
-                    int or_id = ops.top();
-                    ops.pop();
-                    if (Pattern_[or_id] == '|')
-                    {
-                        // lp->(....|<-or...)<-i
-                        lp_id = ops.top();
-                        ops.pop();
-                        NFAdg_.AddEdge(lp_id, or_id + 1);
-                        NFAdg_.AddEdge(or_id, i);
-                    }
-                    else lp_id = or_id;
-                }
-                // two cases: lp->(...)*<-i+1  or  a* 
-                if (i<p_len -1 && Pattern_[i + 1] == '*')
-                {
-                    NFAdg_.AddEdge(lp_id, i + 1);
-                    NFAdg_.AddEdge(i + 1, lp_id);
-                }
-                if (Pattern_[i] == '*' || Pattern_[i] == '(' || Pattern_[i] == ')') 
-                    NFAdg_.AddEdge(i, i + 1);
-            }
-        }
-
-        bool Match(const string &str)
-        {
-            vector<int> candidates;
-            NFAdg_.DFS(0, candidates);
-            size_t p_len = Pattern_.size();
-
-            for (int i = 0; i<str.size(); i++)
-            {
-                vector<int> match;
-                for (int v : candidates)
-                {
-                    if (v < p_len && (Pattern_[v] == str[i] || Pattern_[v] == '.'))
-                        match.push_back(v + 1);
-                }
-
-                NFAdg_.ResetVisit();
-                candidates.clear();
-                for (auto v : match)
-                {
-                    NFAdg_.DFS(v, candidates);
-                }
-            }
-
-            for (int v : candidates) if (v == p_len) return true;
-            return false;
-        }
-
-    private:
-        NFAdg NFAdg_;
-        string Pattern_;
-    };
-
-    bool isMatch(string s, string p)
-    {
-        if (p.size() == 0) return s.size() == 0;
-
-        RegExpNFA nfa(p);
-        return nfa.Match(s);
-    }
-};
-
-/*
 13. Roman to Integer
 */
 class RomanToInt 
@@ -557,43 +222,6 @@ public:
         return result;
     }
 };
-
-/*
-14. Longest Common Prefix
-Write a function to find the longest common prefix string amongst an array of strings.
-*/
-class LongestCommonPrefix
-{
-public:
-    string Solution(vector<string>& strs)
-    {
-        if (strs.size() == 0) return "";
-
-        int len = strs[0].size();
-        int index = 0;
-        for (; index<len; index++)
-        {
-            int c = strs[0][index];
-            bool unmatched = false;
-            for (auto &str : strs)
-            {
-                if (index >= str.size())
-                {
-                    unmatched = true; break;
-                }
-
-                if (str[index] != c)
-                {
-                    unmatched = true; break;
-                }
-            }
-            if (unmatched) break;
-        }
-        
-        return strs[0].substr(0, index);
-    }
-};
-
 
 /*
 15. 3Sum
@@ -699,80 +327,6 @@ public:
 };
 
 /*
-21. Merge Two Sorted Lists
-Merge two sorted linked lists and return it as a new list. 
-The new list should be made by splicing together the nodes of the first two lists.
-*/
-class MergeTwoSortedLists
-{
-public:
-    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2)
-    {
-        ListNode *result = NULL, *prev = NULL;
-        while (l1 != NULL || l2 != NULL)
-        {
-            ListNode *node = NULL;
-            if (l1 == NULL)
-            {
-                node = l2;
-                l2 = l2->next;
-            }
-            else if (l2 == NULL)
-            {
-                node = l1;
-                l1 = l1->next;
-            }
-            else if (l1->val<l2->val)
-            {
-                node = l1;
-                l1 = l1->next;
-            }
-            else
-            {
-                node = l2;
-                l2 = l2->next;
-            }
-            if (prev == NULL) result = prev = node;
-            else { prev->next = node; prev = node; }
-        }
-        return result;
-    }
-};
-
-/*
-24. Swap Nodes in Pairs
-Given a linked list, swap every two adjacent nodes and return its head.
-e.g:
-Given 1->2->3->4, you should return the list as 2->1->4->3.
-You may not modify the values in the list, only nodes itself can be changed.
-*/
-class SwapNodesInPairs {
-public:
-    ListNode* swapPairs(ListNode* head)
-    {
-        if (head == NULL) return NULL;
-
-        ListNode *prev = NULL, *curr = head, *next = curr->next;
-        while (next != NULL)
-        {
-            ListNode *temp = next->next;
-            next->next = curr;
-            curr->next = temp;
-            if (prev != NULL) prev->next = next;
-            else head = next;
-
-            // next already swapped with curr
-            prev = curr;
-            curr = curr->next;
-            if (curr == NULL) break;
-            next = curr->next;
-        }
-
-        return head;
-    }
-};
-
-/*
 26. Remove Duplicates from Sorted Array
 Given a sorted array, remove the duplicates in place 
 such that each element appear only once and return the new length.
@@ -799,70 +353,6 @@ public:
             else it = nums.erase(it);
         }
         return nums.size();
-    }
-};
-
-/*
-28. Implement strStr()
-Returns the index of the first occurrence of needle in haystack or -1(not found).
-*/
-class MyStrStr 
-{
-public:
-    int strstr(const string &haystack, const string &needle)
-    {
-        if (needle.size() == 0) return 0;
-
-        int last = haystack.size() - needle.size() + 1;
-        for (int i = 0; i<last; i++)
-        {
-            int j = 0;
-            int temp = i;
-            for (; j<needle.size(); j++)
-            {
-                if (haystack[temp++] != needle[j]) break;
-            }
-            if (j == needle.size()) return i;
-        }
-        return -1;
-    }
-
-    int sunday(const string &haystack, const string &needle)
-    {
-        // sunday version
-        if (needle.size() == 0) return 0;
-
-        // preproccess pattern
-        vector<int> char_set(256, -1);
-        for (int i = 0; i<needle.size(); i++)
-        {
-            char_set[needle[i] - 'a'] = i;
-        }
-
-        int last_check = haystack.size() - needle.size();
-        for (int i = 0; i <= last_check;)
-        {
-            int j = 0;
-            int temp = i;
-            for (; j<needle.size(); j++)
-            {
-                if (haystack[temp++] != needle[j])
-                {
-                    // mismatch
-                    int index = i + needle.size();
-                    if (index<haystack.size())
-                    {
-                        int val = char_set[haystack[index] - 'a'];
-                        if (val == -1) i = index+1;
-                        else i = index - val;
-                        break;
-                    }
-                    else return -1;
-                }
-            }
-            if (j == needle.size()) return i;
-        }
-        return -1;
     }
 };
 
@@ -955,48 +445,6 @@ private:
             if (board[sub_r][sub_c] == c) return false;
         }
         return true;
-    }
-};
-
-/*
-44. Wildcard Matching
-'?' Matches any single character.
-'*' Matches any sequence of characters (including the empty sequence).
-The matching should cover the entire input string (not partial).
-*/
-class WildCardMatch
-{
-public:
-    bool IsMatch(string s, string p)
-    {
-        int p_index = 0;
-        int s_index = 0;
-        int star_index = -1;
-        int star_matched = 0;
-        while (s_index<s.size())
-        {
-            if (p_index<p.size() && (p.at(p_index) == s.at(s_index) || p.at(p_index) == '?'))
-            {
-                p_index++;
-                s_index++;
-            }
-            else if (p_index<p.size() && p.at(p_index) == '*')
-            {
-                // s_index meets *
-                star_index = ++p_index;
-                star_matched = s_index;
-            }
-            else if (star_index != -1)
-            {
-                // it's under * mode
-                p_index = star_index;
-                s_index = ++star_matched;
-            }
-            else return false;
-        }
-
-        while (p_index<p.size() && p.at(p_index) == '*') p_index++;
-        return p_index == p.size();
     }
 };
 
@@ -1237,6 +685,63 @@ public:
 };
 
 /*
+72. Edit Distance
+Given two words word1 and word2, find the minimum number of steps required to convert word1 to word2.
+(each operation is counted as 1 step.)
+
+You have the following 3 operations permitted on a word:
+
+a) Insert a character
+b) Delete a character
+c) Replace a character
+*/
+class EditDistance {
+public:
+    int minDistance(string word1, string word2)
+    {
+        const size_t size1 = word1.size();
+        const size_t size2 = word2.size();
+
+        vector<vector<int>> dist_matrix;
+        // initialize matirx
+        for (int i = 0; i <= size1; i++)
+        {
+            vector<int> temp;
+            for (int j = 0; j <= size2; j++)
+            {
+                temp.push_back(0);
+            }
+            dist_matrix.push_back(temp);
+        }
+
+        for (int j = 0; j <= size2; j++)
+            dist_matrix[0][j] = j;
+        for (int i = 0; i <= size1; i++)
+            dist_matrix[i][0] = i;
+
+        for (int i = 1; i <= size1; i++)
+        {
+            for (int j = 1; j <= size2; j++)
+            {
+                if (word1.at(i - 1) == word2[j - 1])
+                {
+                    // f[i][j] = f[i-1][j-1]
+                    dist_matrix[i][j] = dist_matrix[i - 1][j - 1];
+                }
+                else
+                {
+                    // min(f[i-1][j]+1,f[i][j-1]+1,f[i-1][j-1]+1)
+                    int min_step = min(dist_matrix[i - 1][j], dist_matrix[i][j - 1]);
+                    dist_matrix[i][j] = min(min_step, dist_matrix[i - 1][j - 1]) + 1;
+                }
+            }
+        }
+
+        return dist_matrix[size1][size2];
+    }
+};
+
+/*
 75. Sort Colors
 Given an array with n objects colored red, white or blue, 
 sort them so that objects of the same color are adjacent,
@@ -1374,52 +879,6 @@ public:
     }
 };
 
-class BestTimeSellStockIII
-{
-public:    
-    int maxProfit(vector<int> &prices)
-    {
-        
-    }
-};
-
-/*
-125. Valid Palindrome
-Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
-
-For example,
-"A man, a plan, a canal: Panama" is a palindrome.
-"race a car" is not a palindrome.
-*/
-class ValidPalindrome {
-public:
-    bool Check(string s)
-    {
-        if (s.size() == 0) return true;
-
-        int begin = 0;
-        int end = s.size() - 1;
-        while (begin<end)
-        {
-            if (!isalnum(s[begin]))
-            {
-                begin++;
-                continue;
-            }
-
-            if (!isalnum(s[end]))
-            {
-                end--;
-                continue;
-            }
-            if (tolower(s[begin]) != tolower(s[end])) return false;
-
-            begin++;
-            end--;
-        }
-        return true;
-    }
-};
 
 /*
 127. Word Ladder
@@ -1510,181 +969,6 @@ public:
 };
 
 /*
-72. Edit Distance
-Given two words word1 and word2, find the minimum number of steps required to convert word1 to word2. 
-(each operation is counted as 1 step.)
-
-You have the following 3 operations permitted on a word:
-
-a) Insert a character
-b) Delete a character
-c) Replace a character
-*/
-
-class EditDistance{
-public:
-    int minDistance(string word1, string word2) 
-    {
-        const size_t size1 = word1.size();
-        const size_t size2 = word2.size();
-
-        vector<vector<int>> dist_matrix;
-        // initialize matirx
-        for (int i = 0; i <= size1; i++)
-        {
-            vector<int> temp;
-            for (int j = 0; j <= size2; j++)
-            {
-                temp.push_back(0);
-            }
-            dist_matrix.push_back(temp);
-        }
-        
-        for (int j = 0; j <= size2; j++)
-            dist_matrix[0][j] = j;
-        for (int i = 0; i <= size1; i++)
-            dist_matrix[i][0] = i;
-
-        for (int i = 1; i <= size1; i++)
-        {
-            for (int j = 1; j <= size2; j++)
-            {
-                if (word1.at(i - 1) == word2[j - 1])
-                {
-                    // f[i][j] = f[i-1][j-1]
-                    dist_matrix[i][j] = dist_matrix[i - 1][j - 1];
-                }
-                else
-                {
-                    // min(f[i-1][j]+1,f[i][j-1]+1,f[i-1][j-1]+1)
-                    int min_step = min(dist_matrix[i - 1][j], dist_matrix[i][j - 1]);
-                    dist_matrix[i][j] = min(min_step, dist_matrix[i - 1][j - 1]) + 1;
-                }
-            }
-        }
-
-        return dist_matrix[size1][size2];
-    }
-};
-
-/*
-138. Copy List with Random Pointer
-A linked list is given such that each node contains an additional random pointer 
-which could point to any node in the list or null.
-Return a deep copy of the list.
-*/
-struct RandomListNode
-{
-    int label;
-    RandomListNode *next, *random;
-    RandomListNode(int x) : label(x), next(NULL), random(NULL) {}
-};
-class CopyRandomList
-{
-public:
-    RandomListNode *CopyList(RandomListNode *head)
-    {
-        if (head == NULL) return NULL;
-        RandomListNode *curr = head;
-        RandomListNode *new_node = NULL;
-        RandomListNode *next_node = NULL;
-        RandomListNode *new_head = NULL;
-        // added new node after old one 
-        // old1->new1->old2->new2
-        while (curr)
-        {
-            new_node = new RandomListNode(curr->label);
-            next_node = curr->next;
-            curr->next = new_node;
-            new_node->next = next_node;
-            curr = next_node;
-        }
-        // modify random for new old
-        curr = head;
-        while (curr)
-        {
-            new_node = curr->next;
-            new_node->random = curr->random == NULL ? NULL : curr->random->next;
-
-            curr = new_node->next;
-        }
-        // split old/new nodes
-        curr = head;
-        while (curr)
-        {
-            new_node = curr->next;
-            if (new_head == NULL)
-                new_head = new_node;
-
-            curr->next = new_node->next;
-            curr = new_node->next;
-            new_node->next = curr == NULL ? NULL : curr->next;
-        }
-        return new_head;
-    }
-};
-
-/*
-141. Linked List Cycle
-Given a linked list, determine if it has a cycle in it.
-*/
-class LinkedListCycle 
-{
-public:
-    bool hasCycle(ListNode *head) 
-    {
-        if (head == NULL) return false;
-
-        ListNode *slow = head;
-        ListNode *fast = head;
-
-        while (fast != NULL && fast->next != NULL)
-        {
-            slow = slow->next; // move 1 step
-            fast = fast->next->next; // move 2 steps
-            if (fast == slow) return true;
-        }
-        return false;
-    }
-};
-
-/*
-142. Linked List Cycle II
-*/
-class LinkedListCycleII 
-{
-public:
-    ListNode *detectCycle(ListNode *head)
-    {
-        if (head == NULL) return NULL;
-
-        ListNode *slow = head;
-        ListNode *fast = head;
-        // find the meeting point
-        ListNode *meet = NULL;
-        while (fast != NULL && fast->next != NULL)
-        {
-            slow = slow->next;
-            fast = fast->next->next;
-            if (fast == slow)
-            {
-                meet = fast;
-                break;
-            }
-        }
-        if (meet == NULL) return NULL;
-
-        slow = head;
-        while (slow != fast)
-        {
-            slow = slow->next;
-            fast = fast->next;
-        }
-        return slow;
-    }
-};
-
-/*
 146. LRU Cache
 Design and implement a data structure for Least Recently Used (LRU) cache. 
 It should support the following operations: get and put.
@@ -1751,49 +1035,6 @@ private:
     int Capacity_;
     unordered_map<int, list<Node>::iterator> Index_;
     list<Node> Cache_;
-};
-
-/*
-160. Intersection of Two Linked Lists
-*/
-class IntersectionTwoLinkedLists 
-{
-public:
-    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
-        int lenA = 0, lenB = 0;
-        ListNode *currA = headA, *currB = headB;
-        while (currA != NULL) { lenA++; currA = currA->next; }
-        while (currB != NULL) { lenB++; currB = currB->next; }
-
-        if (lenA>lenB)
-            for (int i = 0; i<lenA - lenB; i++) headA = headA->next;
-        if (lenB>lenA)
-            for (int i = 0; i<lenB - lenA; i++) headB = headB->next;
-
-        while (headA != NULL && headB != NULL)
-        {
-            if (headA == headB) return headA;
-            else { headA = headA->next; headB = headB->next; }
-        }
-        return NULL;
-    }
-
-    // If one of them reaches the end earlier then reuse it 
-    // by moving it to the beginning of other list.
-    // Once both of them go through reassigning, 
-    // they will be equidistant from the collision point.
-    ListNode *getIntersectionNodeV2(ListNode *headA, ListNode *headB)
-    {
-        if (headA == NULL || headB == NULL) return NULL;
-
-        ListNode *pA = headA, *pB = headB;
-        while (pA != pB)
-        {
-            pA = pA == NULL ? headB : pA->next;
-            pB = pB == NULL ? headA : pB->next;
-        }
-        return pA;
-    }
 };
 
 /*
@@ -2035,27 +1276,6 @@ private:
 };
 
 /*
-237. Delete Node in a Linked List
-*/
-class DeleteNodeInLinkedList
-{
-public:
-    void deleteNode(ListNode* node)
-    {
-        if (node == NULL) return;
-        ListNode *prev = node;
-        while (node && node->next)
-        {
-            node->val = node->next->val;
-            prev = node;
-            node = node->next;
-        }
-        prev->next = NULL;
-        delete node;
-    }
-};
-
-/*
 258. Add Digits
 Given a non-negative integer num, repeatedly add all its digits until the result has only one digit.
 e.g:
@@ -2085,24 +1305,27 @@ public:
 };
 
 /*
-387. First Unique Character in a String
-Given a string, find the first non-repeating character in it and return it's index.
-If it doesn't exist, return -1.
-
-Examples:
-s = "leetcode"
-return 0.
+300. Longest Increasing Subsequence
 */
-class FirstUniqueCharacter {
+class LengthOfLIS
+{
 public:
-    int firstUniqChar(string s) {
-        vector<int> counter(256, 0);
-        for (char c : s) counter[c]++;
-        for (int i = 0; i<s.size(); i++)
-        {
-            if (counter[s[i]] == 1) return i;
+    int Count(vector<int>& nums) {
+        if (nums.size() == 0) return 0;
+
+        int max_len = 1;
+        vector<int> lis_val(nums.size(), 1);
+        for (int i = 0; i<nums.size(); i++) {
+            for (int j = 0; j<i; j++) {
+                if (nums[i]>nums[j] && lis_val[j] + 1 > lis_val[i]) {
+                    // check current i if it can extends lis [0 ~i-1]
+                    lis_val[i] = lis_val[j] + 1;
+                }
+            }
+            if (lis_val[i]>max_len) max_len = lis_val[i];
         }
-        return -1;
+
+        return max_len;
     }
 };
 

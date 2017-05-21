@@ -2,6 +2,8 @@
 #include "leetcode.hpp"
 #include "leetcode_tree.hpp"
 #include "leetcode_pc.hpp"
+#include "leetcode_list.hpp"
+#include "leetcode_string.hpp"
 
 static void TestPermutation()
 {
@@ -365,15 +367,15 @@ static void TestGenericSort()
 static void TestBinaryHeap()
 {
     BasicBinaryHeap<int,MaxHeapOpt<int>> bh(4);
-    bh.Insert(4); 
-    bh.Insert(6); 
-    bh.Insert(7);
-    bh.Insert(5);
+    bh.Push(4); 
+    bh.Push(6);
+    bh.Push(7);
+    bh.Push(5);
     cout << bh.Top() << endl;
     bh.Pop();
     cout << bh.Top() << endl;
-    bh.Insert(8);
-    bh.Insert(9);
+    bh.Push(8);
+    bh.Push(9);
     cout << bh.Top() << endl;
 }
 
@@ -403,9 +405,40 @@ static void TestLinkedListCycle()
     sln.detectCycle(head);
 }
 
+static void TestMergeKSortedLists()
+{
+    // [[-1,1],[-3,1,4],[-2,-1,0,2]]
+    MergekSortedLists sln;
+    ListNode node0(-1);
+    ListNode node01(1);
+    node0.next = &node01;
+
+    ListNode node1(-3);
+    ListNode node11(1);
+    ListNode node12(4);
+    node1.next = &node11;
+    node11.next = &node12;
+
+    ListNode node3(-2);
+    ListNode node31(-1);
+    ListNode node32(0);
+    ListNode node33(2);
+    node3.next = &node31;
+    node31.next = &node32;
+    node32.next = &node33;
+
+    vector<ListNode*> lists{ &node0, &node1,&node3 };
+    ListNode *head = sln.mergeKLists(lists);
+    while (head != NULL) {
+        cout<<head->val;
+        if (head->next != NULL) cout << " ";
+        head = head->next;
+    }
+}
 
 int main(int argc,char *argv[])
 {
+    TestMergeKSortedLists();
     ::getchar();
     
     return 0;

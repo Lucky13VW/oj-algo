@@ -53,7 +53,7 @@ public:
 
     virtual ~BasicBinaryHeap() = default;
 
-    void Insert(const DataType &data)
+    void Push(const DataType &data)
     {
         if (DataSize_ < SizeMax_)
         {
@@ -170,7 +170,7 @@ public:
     virtual void Sort(vector<type> &arr)
     {
         BasicBinaryHeap<type> sortor(arr.size());
-        for (auto &dat : arr) sortor.Insert(dat);
+        for (auto &dat : arr) sortor.Push(dat);
 
         for (int i = 0; i < arr.size(); i++)
         {
@@ -769,15 +769,14 @@ private:
     MyRMQst<> RMQmin_;
 };
 
-struct ListNode
-{
-    int val;
-    ListNode *next;
-    ListNode(int x): val(x), next(NULL) {}
-};
-
 class BasicList 
 {
+    struct ListNode
+    {
+        int val;
+        ListNode *next;
+        ListNode(int x) : val(x), next(NULL) {}
+    };
 public:
     ListNode* ReverseList(ListNode* head) 
     {
