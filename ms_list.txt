@@ -12,7 +12,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 218 The Skyline Problem 25.5% Hard 
 * 88 Merge Sorted Array 31.4% Easy 
 186 Reverse Words in a String II 28.5% Medium 
-268 Missing Number 43.5% Medium 
+* 268 Missing Number 43.5% Medium 
 * 1 Two Sum 29.8% Easy 
 53 Maximum Subarray 38.7% Medium 
 151 Reverse Words in a String 15.7% Medium 
@@ -61,7 +61,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 $ 270 Closest Binary Search Tree Value 38.0% Easy 
 * 23 Merge k Sorted Lists 25.9% Hard 
 * 258 Add Digits 50.2% Easy 
-79 Word Search 25.3% Medium 
+* 79 Word Search 25.3% Medium 
 * 46 Permutations 40.3% Medium 
 91 Decode Ways 18.8% Medium 
 * 94 Binary Tree Inorder Traversal 43.7% 		Medium 

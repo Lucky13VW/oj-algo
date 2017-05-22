@@ -774,6 +774,59 @@ class SortColors
 };
 
 /*
+79. Word Search
+Given a 2D board and a word, find if the word exists in the grid.
+The word can be constructed from letters of sequentially adjacent cell, 
+where "adjacent" cells are those horizontally or vertically neighboring. 
+The same letter cell may not be used more than once.
+
+For example,
+Given board =
+[
+['A','B','C','E'],
+['S','F','C','S'],
+['A','D','E','E']
+]
+word = "ABCCED", -> returns true,
+word = "SEE", -> returns true,
+word = "ABCB", -> returns false.
+*/
+class WordSearch {
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        if (board.size() == 0) return false;
+        if (word.size() == 0) return true;
+
+        for (int i = 0; i<board.size(); i++) {
+            for (int j = 0; j<board[0].size(); j++) {
+                if (board[i][j] == word[0]) {
+                    vector<char> temp(board[0].size(), '0');
+                    vector<vector<char>> visit(board.size(), temp);
+                    if (Search(board, visit, i, j, word, 0)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+private:
+    bool Search(vector<vector<char>>& board, vector<vector<char>>& visit,
+        int i, int j, string &word, int start) {
+        if (start == word.size()) return true;
+        if (i<0 || j<0 || i == board.size() || j == board[0].size() ||
+            visit[i][j] == '1' || board[i][j] != word[start]) return false;
+
+        visit[i][j] = '1';
+        bool is_found = Search(board, visit, i - 1, j, word, start + 1) ||
+            Search(board, visit, i, j - 1, word, start + 1) ||
+            Search(board, visit, i + 1, j, word, start + 1) ||
+            Search(board, visit, i, j + 1, word, start + 1);
+        visit[i][j] = '0'; // back tracking
+        return is_found;
+    }
+};
+
+/*
 88. Merge Sorted Array
 Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
 You may assume that nums1 has enough space (size that is greater or equal to m + n) 
@@ -1301,6 +1354,29 @@ public:
         if (res == 0 && num != 0) res = 9;
 
         return res;
+    }
+};
+
+/*
+268. Missing Number
+Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, 
+find the one that is missing from the array.
+
+For example,
+Given nums = [0, 1, 3] return 2.
+*/
+class MissingNumber 
+{
+public:
+    int Found(vector<int>& nums)
+    {
+        int sum = 0;
+        for (auto val : nums)
+        {
+            sum += val;
+        }
+        int n = nums.size();
+        return (1 + n)*n / 2 - sum;
     }
 };
 
