@@ -14,14 +14,14 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 186 Reverse Words in a String II 28.5% Medium 
 * 268 Missing Number 43.5% Medium 
 * 1 Two Sum 29.8% Easy 
-53 Maximum Subarray 38.7% Medium 
+* 53 Maximum Subarray 38.7% Medium 
 151 Reverse Words in a String 15.7% Medium 
 116 Populating Next Right Pointers in Each Node 36.8% Medium 
 * 297 Serialize and Deserialize Binary Tree 31.5% Hard 
 * 75 Sort Colors 36.6% Medium 
 * 103 Binary Tree Zigzag Level Order Traversal 32.2% Medium 
 238 Product of Array Except Self 47.0% Medium 
-73 Set Matrix Zeroes 35.1% Medium 
+* 73 Set Matrix Zeroes 35.1% Medium 
 * 121 Best Time to Buy and Sell Stock 39.1% Easy 
 * 237 Delete Node in a Linked List 45.4% Easy 
 * 445 Add Two Numbers II 46.2% Medium 
@@ -49,7 +49,7 @@ $ 348 Design Tic-Tac-Toe 45.2% 	Medium
 * 232 Implement Queue using Stacks 34.9% Easy 
 * 102 Binary Tree Level Order Traversal 36.9% Easy 
 * 189 Rotate Array 23.5% Easy 
-71 Simplify Path 24.0% Medium 
+* 71 Simplify Path 24.0% Medium 
 * 387 First Unique Character in a String 45.3% Easy 
 * 106 Construct Binary Tree from Inorder and Postorder Traversal 30.9% Medium 
 * 204 Count Primes 26.1% Easy 

@@ -625,6 +625,31 @@ private:
 };
 
 /*
+53. Maximum Subarray
+ind the contiguous subarray within an array (containing at least one number) which has the largest sum.
+
+For example, given the array [-2,1,-3,4,-1,2,1,-5,4],
+the contiguous subarray [4,-1,2,1] has the largest sum = 6.
+*/
+class MaximumSubarray {
+public:
+    int Calc(vector<int>& nums) {
+        int arr_size = nums.size();
+        if (arr_size == 0) return 0;
+
+        int max_sum = nums[0];
+        vector<int> max_sofar(arr_size, max_sum);
+        for (int i = 1; i<arr_size; i++) {
+            // the max is either it ends here(sofar[i-1]+nums[i]) or starts from here
+            max_sofar[i] = max(max_sofar[i - 1] + nums[i], nums[i]);
+            if (max_sofar[i]>max_sum) max_sum = max_sofar[i];
+        }
+
+        return max_sum;
+    }
+};
+
+/*
 54. Spiral Matrix
 Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
 */
@@ -685,6 +710,35 @@ public:
 };
 
 /*
+71. Simplify Path
+Given an absolute path for a file (Unix-style), simplify it.
+
+For example,
+path = "/home/", => "/home"
+path = "/a/./b/../../c/", => "/c"
+*/
+class SimplifyPath {
+public:
+    string solution(string path) {
+        stringstream input(path);
+        vector<string> folders;
+        string sub;
+        while (getline(input, sub, '/')) {
+            if (sub == "" || sub == ".") continue;
+            if (sub == "..") {
+                if (folders.size() != 0) folders.pop_back();
+            }
+            else folders.push_back(sub);
+        }
+
+        stringstream  ss;
+        for (auto &name : folders)  ss << "/" << name;
+
+        return folders.empty() ? "/" : ss.str();
+    }
+};
+
+/*
 72. Edit Distance
 Given two words word1 and word2, find the minimum number of steps required to convert word1 to word2.
 (each operation is counted as 1 step.)
@@ -738,6 +792,33 @@ public:
         }
 
         return dist_matrix[size1][size2];
+    }
+};
+
+/*
+73. Set Matrix Zeroes
+Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in place.
+*/
+class SetMatrixZeroe {
+public:
+    void Solution(vector<vector<int>>& matrix) {
+        if (matrix.size() == 0) return;
+
+        int rows = matrix.size(), cols = matrix[0].size();
+        bool fr_col = false;
+        for (int i = 0; i<rows; i++) {
+            if (matrix[i][0] == 0) fr_col = true;
+            for (int j = 1; j<cols; j++) {
+                if (matrix[i][j] == 0) matrix[0][j] = matrix[i][0] = 0;
+            }
+        }
+
+        for (int i = rows - 1; i >= 0; i--) {
+            for (int j = cols - 1; j>0; j--) {
+                if (matrix[0][j] == 0 || matrix[i][0] == 0)  matrix[i][j] = 0;
+            }
+            if (fr_col) matrix[i][0] = 0;
+        }
     }
 };
 
