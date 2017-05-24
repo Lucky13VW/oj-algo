@@ -1,4 +1,4 @@
-#ifndef LEETCODE_HPP
+ï»¿#ifndef LEETCODE_HPP
 #define LEETCODE_HPP
 
 #include <iostream>
@@ -27,6 +27,14 @@ struct TreeNode
     TreeNode *left;
     TreeNode *right;
     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+struct Interval 
+{
+    int start;
+    int end;
+    Interval() : start(0), end(0) {}
+    Interval(int s, int e) : start(s), end(e) {}
 };
 
 /*
@@ -457,7 +465,7 @@ public:
     void MirrorFlip(vector<vector<int>>& matrix)
     {
         int n = matrix.size();
-        // diagonal ¡¯/¡®
+        // diagonal â€™/â€˜
         for (int i = 0; i<n - 1; i++)
         {
             for (int j = 0; j<n - i; j++)
@@ -709,6 +717,40 @@ public:
 
 };
 
+/**
+56. Merge Intervals
+Given a collection of intervals, merge all overlapping intervals.
+
+For example,
+Given [1,3],[2,6],[8,10],[15,18],
+return [1,6],[8,10],[15,18].
+*/
+class MergeIntervals 
+{
+public:
+    vector<Interval> merge(vector<Interval>& intervals) {
+        vector<Interval> result;
+        if (intervals.size() == 0) return result;
+
+        sort(intervals.begin(), intervals.end(),
+            [](Interval &a, Interval &b) { return a.start < b.start; });
+
+        Interval prev = intervals[0];
+        for (int i = 1; i<intervals.size(); i++) {
+            if (prev.end < intervals[i].start) {
+                result.push_back(prev);
+                prev.start = intervals[i].start;
+                prev.end = intervals[i].end;
+            }
+            else if (intervals[i].end>prev.end) { // merge
+                prev.end = intervals[i].end;
+            }
+        }
+        result.push_back(prev);
+        return result;
+    }
+};
+
 /*
 71. Simplify Path
 Given an absolute path for a file (Unix-style), simplify it.
@@ -955,6 +997,39 @@ public:
     }
 };
 
+/*â€‹
+91. Decode Ways
+A message containing letters from A-Z is being encoded to numbers using the following mapping:
+'A' -> 1
+'B' -> 2
+...
+'Z' -> 26
+Given an encoded message containing digits, determine the total number of ways to decode it.
+
+For example,
+Given encoded message "12", it could be decoded as "AB" (1 2) or "L" (12).
+The number of ways decoding "12" is 2.
+*/
+class DecodeWays {
+public:
+    int Count(string s) {
+        if (s.empty() || s[0] == '0') return 0;
+
+        int prev = 0;
+        int cur = 1;
+        for (size_t i = 1; i <= s.size(); ++i) {
+            if (s[i - 1] == '0') cur = 0;
+            if (i < 2 || !(s[i - 2] == '1' ||
+                (s[i - 2] == '2' && s[i - 1] <= '6')))
+                prev = 0;
+            int tmp = cur;
+            cur = prev + cur;
+            prev = tmp;
+        }
+        return cur;
+    }
+};
+
 /*
 121. Best Time to Buy and Sell Stock  
 If you were only permitted to complete at most one transaction 
@@ -962,7 +1037,7 @@ If you were only permitted to complete at most one transaction
 Example 1:
 Input: [7, 1, 5, 3, 6, 4]
 Output: 5
-max. difference = 6-1 = 5 (not 7-1 = 6£©
+max. difference = 6-1 = 5 (not 7-1 = 6ï¼‰
 */
 class BestTimeBuySellStock
 {
