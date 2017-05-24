@@ -72,7 +72,7 @@ $ 270 Closest Binary Search Tree Value 38.0% Easy
 * 125 Valid Palindrome 25.3% Easy 
 * 112 Path Sum 32.9% Easy 
 124 Binary Tree Maximum Path Sum 25.0% Hard 
-56 Merge Intervals 28.3% Hard 
+* 56 Merge Intervals 28.3% Hard 
 365 Water and Jug Problem 26.0% Medium 
 * 55 Jump Game 29.2% Medium 
 * 300 Longest Increasing Subsequence 37.3% Medium 

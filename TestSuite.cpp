@@ -436,9 +436,18 @@ static void TestMergeKSortedLists()
     }
 }
 
+static void TestMergeIntervals()
+{
+    MergeIntervals sln;
+    vector<Interval> input{ {74,78}, {61,63},{46,53},{51,54},{61,63} };
+    vector<Interval> result = sln.merge(input);
+    for (auto &r : result) cout << r.start << "_" << r.end << endl;
+}
+
 int main(int argc,char *argv[])
 {
-    TestMergeKSortedLists();
+    DecodeWays sln;
+    cout << sln.Count("10") << endl;
     ::getchar();
     
     return 0;
