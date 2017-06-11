@@ -794,6 +794,28 @@ public:
     }
 };
 
+// Greatest Common Divisor
+// Euclidean algorithm 
+// gcd(a, b) = gcd(b, r)  
+// r = a%b, k = a/b -> a = b*k +r 
+// if r==0 gcd(a,b) = b  gcd(a,b)=gcd(b,a mod b)
+class GCD
+{
+public:
+    int Euclid(int a, int b){ return b == 0 ? a : Euclid(b,a%b); }
+
+    int EuclidIte(int a, int b)
+    {
+        while (b!=0){
+            int temp = b;
+            b = a%b;
+            a = temp; 
+        }
+        return a; // from b
+    }
+};
+
+// count how many primes in n
 class CountPrimes
 {
 public:
@@ -850,6 +872,7 @@ private:
     }
 };
 
+// methods of sqr/power
 class PowSqrSolution 
 {
 public:
