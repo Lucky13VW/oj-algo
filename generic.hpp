@@ -1421,53 +1421,65 @@ public:
         }
         return lis_val[longest_index];
     }
+};
 
-    // 0-1 KnapSack 
-    int Knapsack0_1(const vector<int> &value_tab, const vector<int> &weight_tab, int weight_limit)
-    {
-        vector<vector<int>> max_value_tab;
-        for (int i = 0; i < value_tab.size(); i++)
-        {
-            vector<int> temp;
-            for (int j = 0; j <= weight_limit; j++)
-            {
-                temp.push_back(0);
-            }
-            max_value_tab.push_back(temp);
-        }
+class KnapsackProblem
+{
+public:
+	// 0-1 KnapSack 
+	// F[i,j] = max{F[i-1,j], F[i-1,j-Wi]+Vi(j>=Wi)}
+	int Knapsack0_1(const vector<int> &value_tab, const vector<int> &weight_tab, int weight_limit, bool exact_match = false)
+	{
+		vector<vector<int>> max_value_tab;
+		for (int i = 0; i < value_tab.size(); i++)
+		{
+			vector<int> temp;
+			for (int j = 0; j <= weight_limit; j++)
+			{
+				// if requires exact-match filling, f[0]=0, f[1~weight_limit]= -INF
+				if (j>0 && exact_match) temp.push_back(INT_MIN);
+				else temp.push_back(0);
+			}
+			max_value_tab.push_back(temp);
+		}
 
-        for (int index = 0; index < value_tab.size(); index++)
-        {
-            int weight_item = weight_tab[index];
-            int value_item = value_tab[index];
-            int pre_index = 0;
-            if (index > 0)
-                pre_index = index - 1;
+        int result_max = 0;
+		for (int index = 0; index < value_tab.size(); index++)
+		{
+			int weight_item = weight_tab[index];
+			int value_item = value_tab[index];
+			int pre_index = 0;
+			if (index > 0)
+				pre_index = index - 1;
 
-            for (int j = 0; j <= weight_limit; j++)
-            {    
-                int  without_item_value = max_value_tab[pre_index][j];
-                int max_value = without_item_value;
-                if (weight_item <= j)
-                {
-                    int with_item_value =  0;
-                    if (index>0)
-                    {
-                        int wighout_item_weight = j - weight_item;
-                        with_item_value = max_value_tab[pre_index][wighout_item_weight] + value_item;
-                    }
-                    else
-                    { 
-                        with_item_value = value_item;
-                    }
-                    max_value = without_item_value>with_item_value ? without_item_value : with_item_value;
-                }
-                max_value_tab[index][j] = max_value;
-            }
-        }
+            // optimization: reverse iteration
+            // for(int j=weight_limit; j>=weight_item;j--)
+			for (int j = 0; j <= weight_limit; j++)
+			{
+				int without_item_value = max_value_tab[pre_index][j];
+				int max_value = without_item_value;
+				// if current weight j can accommodate current item weight
+				// if no max_value_tab[index][j]==max_value_tab[index-1][j]
+				if (weight_item <= j) 
+				{
+					int with_item_value = 0;
+					// cacluate f[i-1][j-Wi]+Vi
+					if (index>0) with_item_value = max_value_tab[pre_index][j - weight_item] + value_item;
+					else with_item_value = value_item; // no i-1,  put current value here
+					
+					// compare f[i-1][j] with f[i-1][j-Wi]+Vi
+					max_value = without_item_value>with_item_value ? without_item_value : with_item_value;
+				}
+				max_value_tab[index][j] = max_value;
+                result_max = max_value>result_max?max_value:result_max;
+			}
+		}
 
-        return max_value_tab[value_tab.size() - 1][weight_limit - 1];
-    }
+		//return max_value_tab[value_tab.size() - 1][weight_limit - 1];
+        return result_max;
+	}
+
+    
 };
 
 template<typename id_type,typename data_type>

@@ -84,8 +84,8 @@ static void TestDP_Knapsack01()
         cout << data << " ";
     }
     cout << endl;
-    BasicDP dp;
-    int max = dp.Knapsack0_1(value, weight, 10);
+    KnapsackProblem ksp;
+    int max = ksp.Knapsack0_1(value, weight, 10);
     cout << "total:10, max:" << max << endl;;
 
 }
