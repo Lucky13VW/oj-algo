@@ -1,6 +1,6 @@
 # setup user name email
-git config --global user.name "abc"
-git config --global user.email "abc@123.com"
+git config --global user.name "lucky13vw"
+git config --global user.email "vw01eipi@outlook.com"
 
 # setup SSH key for github
 ssh-keygen -t rsa -C "abc@123.com"
