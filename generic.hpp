@@ -1602,4 +1602,39 @@ public:
     }
 };
 
+class CheckEndian
+{
+private:
+	union check
+	{
+		int num;
+		char chr;
+	};
+
+	bool IsLittleEndian1()
+	{
+		check c;
+		c.num = 1;
+		if (c.chr == 1) return true;
+		else return false;
+	}
+
+	bool IsLittleEndian2(void)
+	{
+		unsigned short flag = 0x4321;
+		if (*(unsigned char*)&flag == 0x21) return true;
+		else return false;
+	}
+
+public:
+	static void Check()
+	{
+		CheckEndian check;
+		string statement = "It's little endian!";
+		if (!check.IsLittleEndian1()) statement = "It's big endian!";
+
+		cout<< statement <<endl;
+	}
+};
+
 #endif
