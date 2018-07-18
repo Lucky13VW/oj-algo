@@ -50,8 +50,9 @@ git branch master
 git merge dev
 git branch -d dev
 
-# list remote branches
-git branch -r
+# list branches
+git branch -a # all branches
+git branch -r # remote branches
 # list branch binding to remote repo
 git branch -vv
 # create and switch to branch binding to remote repo
