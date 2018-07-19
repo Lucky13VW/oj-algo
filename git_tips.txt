@@ -21,7 +21,7 @@ git add .
 git commit -am "yyy"
 # xxx repository created on github remote default name is origin
 git remote add origin git@github.com:Lucky13VW/xxx.git
-# remote 
+# push local master to remote origin, and set default host to origin(-u) 
 git push -u origin master
 
 # review where origin links to
@@ -57,3 +57,10 @@ git branch -r # remote branches
 git branch -vv
 # create and switch to branch binding to remote repo
 git checkout -b release1.0 origin/release1.0
+
+# create local branch
+git branch dev1
+git checkout dev1
+git checkout -b dev1 # combine above 2 commands
+# sumbit local branch to remote
+git push origin dev1
